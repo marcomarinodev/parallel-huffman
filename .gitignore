@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+main
+
+# vscode
+.vscode
+
+# node modules
+node_modules
