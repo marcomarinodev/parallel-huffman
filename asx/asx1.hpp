@@ -2,7 +2,7 @@
 #include <vector>
 #include <thread>
 #include <string>
-#include "../utimer.hpp"
+#include "utils.hpp"
 
 #ifndef ASX1_HPP
 #define ASX1_HPP
@@ -11,7 +11,7 @@ namespace asx1
 {
   void rand_init(std::vector<double>* input);
 
-  void print_vector(std::string vec_name, std::vector<double> input);
+  void print_vector(const std::string& vec_name, std::vector<double> input);
 
   template <typename T>
   void apply_func_to_vec(std::vector<T>* v, T (*f)(T), int vlen, int nw) 
@@ -54,6 +54,8 @@ namespace asx1
     
     print_vector("result vector", *v);  
   }
+
+  void execute(int vlen, int nw);
 }
 
 #endif

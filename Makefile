@@ -1,16 +1,16 @@
 CXX = g++
-CFLAGS = -Wall -g -pthread
+CFLAGS = -O3 -Wall -g -pthread
 TARGET = main
 MAKEFLAGS = --no-print-directory
-ASX = asx
+ASXS = ./asx/*.cpp
 
 all: $(TARGET)
 
 $(TARGET): $(TARGET).cpp
-	$(CXX) $(CFLAGS) $(TARGET).cpp ./$(ASX)/$(ASX)1.cpp -o $(TARGET)
+	$(CXX) $(CFLAGS) $(TARGET).cpp $(ASXS) -o $(TARGET)
 
 run:
-	./$(TARGET)
+	./$(TARGET) $(SIZE)
 
 clean:
 	$(RM) $(TARGET)
