@@ -1,12 +1,16 @@
 //
 // Created by marco.marino on 5/16/2023.
 //
-#include <iostream>
-#include <iomanip>
-#include <chrono>
+
 
 #ifndef UTILS_H
 #define UTILS_H
+
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <fstream>
+#include <vector>
 
 #define START(timename) auto timename = std::chrono::system_clock::now();
 #define STOP(timename,elapsed)  auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - timename).count();
@@ -48,5 +52,7 @@ public:
             (*us_elapsed) = musec;
     }
 };
+
+std::vector<std::string> read_file(std::string file_path);
 
 #endif
