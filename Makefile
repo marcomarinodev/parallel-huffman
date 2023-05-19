@@ -4,16 +4,20 @@ TARGET = main
 MAKEFLAGS = --no-print-directory
 ASXS = ./asx/*.cpp
 
-all: $(TARGET)
+output: ./libs/main.o ./libs/asx1.o ./libs/asx2.o ./libs/utils.o 
+	$(CXX) $(CFLAGS) ./libs/main.o ./libs/asx1.o ./libs/asx2.o ./libs/utils.o -o output
 
-$(TARGET): $(TARGET).cpp
-	$(CXX) $(CFLAGS) $(TARGET).cpp $(ASXS) -o $(TARGET)
+./libs/main.o: main.cpp
+	$(CXX) $(CFLAGS) -c main.cpp -o ./libs/main.o
 
-run:
-	./$(TARGET) $(SIZE)
+./libs/asx1.o: ./asx/asx1.cpp ./asx/asx1.hpp
+	$(CXX) $(CFLAGS) -c ./asx/asx1.cpp -o ./libs/asx1.o
+
+./libs/asx2.o: ./asx/asx2.cpp ./asx/asx2.hpp
+	$(CXX) $(CFLAGS) -c ./asx/asx2.cpp -o ./libs/asx2.o
+
+./libs/utils.o: ./asx/utils.cpp ./asx/utils.hpp
+	$(CXX) $(CFLAGS) -c ./asx/utils.cpp -o ./libs/utils.o
 
 clean:
-	$(RM) $(TARGET)
-
-rebuild:
-	make $(MAKEFLAGS) clean && make $(MAKEFLAGS) && make $(MAKEFLAGS) run
+	rm ./libs/*.o output
