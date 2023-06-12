@@ -1,9 +1,10 @@
 //
-// Created by marco.marino on 5/20/2023.
+// Created by marco.marino on 5/16/2023.
 //
 
-#ifndef PARALLEL_DISTRIB_COMPUTING_UTILS_H
-#define PARALLEL_DISTRIB_COMPUTING_UTILS_H
+
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <iostream>
 #include <iomanip>
@@ -53,13 +54,9 @@ public:
     }
 };
 
-std::vector<char> read_file(std::string file_path);
+std::vector<std::string> read_file(std::string file_path);
 
 template <typename VecType>
 bool vec_contains(std::vector<VecType> v, VecType element);
 
-bool testEqualVectors(std::vector<int> vec1, std::vector<int> vec2);
-
-void print_ascii_html_value(char c);
-
-#endif //PARALLEL_DISTRIB_COMPUTING_UTILS_H
+#endif

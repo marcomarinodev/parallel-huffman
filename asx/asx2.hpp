@@ -1,17 +1,16 @@
 //
-// Created by marco.marino on 5/20/2023.
+// Created by marco.marino on 5/16/2023.
 //
-
-#ifndef PARALLEL_DISTRIB_COMPUTING_ASX2_H
-#define PARALLEL_DISTRIB_COMPUTING_ASX2_H
-
 #include <vector>
 #include <algorithm>
 #include <future>
-#include "utils.h"
+#include "utils.hpp"
 
-namespace asx2 {
+#ifndef ASX2_HPP
+#define ASX2_HPP
 
+namespace asx2
+{
     template<typename Tin, typename Tout>
     Tout dc(Tin input, bool (*basecase)(Tin), Tout (*solve)(Tin), std::vector<Tin> (*divide)(Tin), Tout (*conquer)(std::vector<Tout>))
     {
@@ -35,6 +34,8 @@ namespace asx2 {
 
         return result;
     }
+
+    bool testVecsIfEquals(std::vector<int> vec1, std::vector<int> vec2);
 
     // lambdas
     auto basecase = [](std::vector<int> vec) {
@@ -76,6 +77,6 @@ namespace asx2 {
     };
 
     void execute(int size);
-} // asx2
+}
 
-#endif //PARALLEL_DISTRIB_COMPUTING_ASX2_H
+#endif

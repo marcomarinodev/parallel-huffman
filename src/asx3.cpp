@@ -18,14 +18,14 @@ public:
     int def_map_nw = 2;
     int def_red_nw = 2;
     // mappers outputs
-    vector<map<string, int>> mappers_outputs;
+    vector<map<char, int>> mappers_outputs;
     // reducers queues
-    vector<vector<pair<string, int>>> reducers_queue;
+    vector<vector<pair<char, int>>> reducers_queue;
     // reducers queues mutexes
     vector<mutex> rq_mutexes;
 
     mutex reducers_result_mutex;
-    map<string, int> reducers_result;
+    map<char, int> reducers_result;
 
     Asx3(int def_map_nw, int def_red_nw)
     {
@@ -65,7 +65,7 @@ public:
             {
                 // we use for each entry a hash function
                 // to decide which is the recipient queue
-                auto reducer_queue_index = (hash<string>{}(entry.first)) % reducer_nw;
+                auto reducer_queue_index = (hash<char>{}(entry.first)) % reducer_nw;
 
                 // locking the recipient queue to push back the mapper result
                 unique_lock<mutex> u_lock(rq_mutexes[reducer_queue_index]);

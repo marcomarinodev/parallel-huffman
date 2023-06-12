@@ -16,23 +16,23 @@ void active_wait(int usecs)
     }
 }
 
-std::vector<std::string> read_file(std::string file_path)
+std::vector<char> read_file(std::string file_path)
 {
-    std::ifstream file(file_path);
-    std::vector<std::string> words;
-
-    if (file.is_open())
+    std::vector<char> characters;
+    std::ifstream input_file(file_path);
+    
+    if (input_file.is_open())
     {
-        std::string word;
-        while (file >> word)
-            words.push_back(word);
+        char c;
+        while (input_file.get(c))
+            characters.push_back(c);
 
-        file.close();
-        return words;
+        input_file.close();
+        return characters;
     }
 
     std::cout << "Unable to open a file named " << file_path << std::endl;
-    return words;
+    return characters;
 }
 
 template <typename VecType>
@@ -49,4 +49,9 @@ bool testEqualVectors(std::vector<int> vec1, std::vector<int> vec2)
         if (vec1[i] != vec2[i]) return false;
 
     return true;
+}
+
+void print_ascii_html_value(char c)
+{
+    std::cout << "&#" << std::dec << static_cast<int>(c) << ";";
 }

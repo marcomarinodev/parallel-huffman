@@ -1,51 +1,99 @@
 #include <cstring>
+// #include <ff/parallel_for.hpp>
 #include "../includes/asx1.h"
 #include "../includes/asx2.h"
 #include "asx3.cpp"
+#include "../includes/huffman.h"
+#include <cerrno>
 
 using namespace std;
 
-int main(int argc, char* argv[])
+void concurrent_write(const string &str, int start, int end, const string &filename)
 {
-    cout << "starting" << endl;
-    // cli arguments
-    const bool print_res = argc > 1 && !strcmp(argv[1], "p");
-    const string filename = argc > 2 ? argv[2] : "sample";
+	ofstream file(filename, ios::in | ios::out);
+	if (file.is_open())
+	{
+		file.seekp(start);
+		for (int i = start; i < end; i++)
+			file << str[i];
+		file.close();
+		return;
+	}
+	
+	// handling opening file error
+	cerr << "Error: failed to open file " << filename << " " << strerror(errno) << endl;
+}
 
-    vector<string> words = read_file("./inputs/" + filename + ".txt");
-    map<string, int> par_words_count, seq_words_count;
+int main(int argc, char *argv[])
+{
+	cout << "starting" << endl;
+	// cli arguments
+	const bool print_res = argc > 1 && !strcmp(argv[1], "p");
+	const string filename = argc > 2 ? argv[2] : "sample";
 
-    Asx3 asx3(2, 2);
+	cout << "reading filename: " << filename << endl;
 
-    int map_nw = asx3.def_map_nw;
-    int red_nw = asx3.def_red_nw;
+	vector<char> chars = read_file("./inputs/" + filename + ".txt");
+	map<char, int> par_map_chars, seq_map_chars;
 
-    auto mapper = [](string w) { return make_pair(w, 1); };
-    auto reduce = [](int a, int b) { return a + b; };
+	Asx3 asx3(2, 2);
 
-    { utimer t0("par_words_count");
-        par_words_count = asx3.par_gmr<string, int, string>(words, map_nw, red_nw);
-    }
+	int map_nw = asx3.def_map_nw;
+	int red_nw = asx3.def_red_nw;
 
-    { utimer t1("seq_words_count");
-        seq_words_count = asx3.gmr<string, int, string>(words, mapper, reduce);
-    }
+	auto mapper = [](char w)
+	{ return make_pair(w, 1); };
+	auto reduce = [](int a, int b)
+	{ return a + b; };
 
-    if (print_res) {
-        for (auto word: par_words_count)
-            cout << "(" << word.first << ", " << word.second << ")" << endl;
-        cout << "================" << endl;
+	{
+		utimer t0("par_words_count");
+		par_map_chars = asx3.par_gmr<char, int, char>(chars, map_nw, red_nw);
+	}
 
-        for (auto word: seq_words_count)
-            cout << "(" << word.first << ", " << word.second << ")" << endl;
-    }
+	{
+		utimer t1("seq_words_count");
+		seq_map_chars = asx3.gmr<char, int, char>(chars, mapper, reduce);
+	}
 
-    if (par_words_count == seq_words_count)
-        cout << "The result is correct!" << endl;
-    else cout << "Invalid result!" << endl;
+	if (print_res)
+	{
+		for (auto character : par_map_chars)
+			cout << "(" << character.first << ", " << character.second << ")" << endl;
+	}
 
-    // asx1::execute(vlen, nw);
-    // asx2::execute(size);
+	if (par_map_chars == seq_map_chars)
+		cout << "The result is correct!" << endl;
+	else
+		cout << "Invalid result!" << endl;
 
-    return 0;
+	min_heap_node *huffman_tree = build_huffman_tree(par_map_chars);
+	map<char, string> encoding_table = build_encoding_table(huffman_tree);
+
+	for (const auto &[character, code] : encoding_table)
+	{
+		cout << character << ": " << code << endl;
+
+		char code_char_arr[code.size()];
+		strcpy(code_char_arr, code.c_str());
+	}
+
+	// encoding phase
+	const string str = "Hello World!";
+	const int num_threads = 3;
+	const int chunk_size = str.size() / num_threads;
+	thread threads[num_threads];
+	
+	for (int i = 0; i < num_threads; i++)
+	{
+		int start = i * chunk_size;
+		int end = (i == num_threads - 1) ? str.size() : start + chunk_size;
+
+		threads[i] = thread(concurrent_write, str, start, end, "./outputs/output.txt");
+	}
+
+	for (int i = 0; i < num_threads; i++)
+		threads[i].join();
+
+	return 0;
 }
