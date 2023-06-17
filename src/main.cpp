@@ -1,28 +1,16 @@
-#include <cstring>
 // #include <ff/parallel_for.hpp>
+#include "../includes/tests.h"
 #include "../includes/asx1.h"
 #include "../includes/asx2.h"
 #include "asx3.cpp"
 #include "../includes/huffman.h"
-#include <cerrno>
+
+
+#include <future>
+#include <filesystem>
+#include <list>
 
 using namespace std;
-
-void concurrent_write(const string &str, int start, int end, const string &filename)
-{
-	ofstream file(filename, ios::in | ios::out);
-	if (file.is_open())
-	{
-		file.seekp(start);
-		for (int i = start; i < end; i++)
-			file << str[i];
-		file.close();
-		return;
-	}
-	
-	// handling opening file error
-	cerr << "Error: failed to open file " << filename << " " << strerror(errno) << endl;
-}
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +21,13 @@ int main(int argc, char *argv[])
 
 	cout << "reading filename: " << filename << endl;
 
-	vector<char> chars = read_file("./inputs/" + filename + ".txt");
+	vector<char> chars;
+
+	{
+		utimer seq_read("seq read");
+		chars = read_file("./inputs/" + filename + ".txt");
+	}
+
 	map<char, int> par_map_chars, seq_map_chars;
 
 	Asx3 asx3(2, 2);
@@ -41,10 +35,8 @@ int main(int argc, char *argv[])
 	int map_nw = asx3.def_map_nw;
 	int red_nw = asx3.def_red_nw;
 
-	auto mapper = [](char w)
-	{ return make_pair(w, 1); };
-	auto reduce = [](int a, int b)
-	{ return a + b; };
+	auto mapper = [](char w) { return make_pair(w, 1); };
+	auto reduce = [](int a, int b) { return a + b; };
 
 	{
 		utimer t0("par_words_count");
@@ -78,22 +70,19 @@ int main(int argc, char *argv[])
 		strcpy(code_char_arr, code.c_str());
 	}
 
+	const string data_100k = vec_to_string(chars);
+	par_write_file("./outputs/output.txt", data_100k, 2);
+
 	// encoding phase
-	const string str = "Hello World!";
-	const int num_threads = 3;
-	const int chunk_size = str.size() / num_threads;
-	thread threads[num_threads];
-	
-	for (int i = 0; i < num_threads; i++)
-	{
-		int start = i * chunk_size;
-		int end = (i == num_threads - 1) ? str.size() : start + chunk_size;
+	// vector<char> all_chars;
+	// {
+	// 	utimer t2("p read");
+	// 	all_chars = par_read_file("./inputs/" + filename + ".txt", 2);
+	// }
 
-		threads[i] = thread(concurrent_write, str, start, end, "./outputs/output.txt");
-	}
+	// cout << vec_to_string(all_chars) << endl;
 
-	for (int i = 0; i < num_threads; i++)
-		threads[i].join();
+	// if (all_chars == chars) cout << "OK" << endl;
 
 	return 0;
 }

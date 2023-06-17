@@ -1,4 +1,0 @@
-Hello everyone it's Marco here. I created
-this text because I want to test the read function written in C++.
-created created
-            Goodbye!

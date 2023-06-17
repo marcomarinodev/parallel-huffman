@@ -20,7 +20,7 @@ void asx2::execute(int size)
     { utimer t0("parallel sum");
         auto doubled_v = dc<vector<int>, vector<int>>(v, basecase, solve, divide, conquer);
 
-        if (testEqualVectors(test_doubled_v, doubled_v))
+        if (test_doubled_v == doubled_v)
             cout << "result is correct" << endl;
         else cout << "invalid result" << endl;
     }
