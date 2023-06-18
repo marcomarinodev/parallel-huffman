@@ -41,8 +41,8 @@ void print_huffman_tree(struct min_heap_node* root, string str);
 
 min_heap_node* build_huffman_tree(map<char, int> chars_count);
 
-map<char, string> build_encoding_table(min_heap_node* huffman_tree);
+unordered_map<char, string> build_encoding_table(min_heap_node* huffman_tree);
 
-void store_codes(map<char, string>& encoding_table, min_heap_node* huffman_tree, string code, int index);
+void store_codes(unordered_map<char, string>& encoding_table, min_heap_node* huffman_tree, string code, int index);
 
 #endif

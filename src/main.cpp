@@ -5,10 +5,12 @@
 #include "asx3.cpp"
 #include "../includes/huffman.h"
 
-
 #include <future>
 #include <filesystem>
 #include <list>
+#include <bitset>
+#include <condition_variable>
+#include <unordered_map>
 
 using namespace std;
 
@@ -35,8 +37,10 @@ int main(int argc, char *argv[])
 	int map_nw = asx3.def_map_nw;
 	int red_nw = asx3.def_red_nw;
 
-	auto mapper = [](char w) { return make_pair(w, 1); };
-	auto reduce = [](int a, int b) { return a + b; };
+	auto mapper = [](char w)
+	{ return make_pair(w, 1); };
+	auto reduce = [](int a, int b)
+	{ return a + b; };
 
 	{
 		utimer t0("par_words_count");
@@ -60,7 +64,7 @@ int main(int argc, char *argv[])
 		cout << "Invalid result!" << endl;
 
 	min_heap_node *huffman_tree = build_huffman_tree(par_map_chars);
-	map<char, string> encoding_table = build_encoding_table(huffman_tree);
+	unordered_map<char, string> encoding_table = build_encoding_table(huffman_tree);
 
 	for (const auto &[character, code] : encoding_table)
 	{
@@ -70,19 +74,9 @@ int main(int argc, char *argv[])
 		strcpy(code_char_arr, code.c_str());
 	}
 
-	const string data_100k = vec_to_string(chars);
-	par_write_file("./outputs/output.txt", data_100k, 2);
+	// vector<vector<bitset<8>>> compressed_chunks = par_compress(chars, encoding_table);
 
-	// encoding phase
-	// vector<char> all_chars;
-	// {
-	// 	utimer t2("p read");
-	// 	all_chars = par_read_file("./inputs/" + filename + ".txt", 2);
-	// }
-
-	// cout << vec_to_string(all_chars) << endl;
-
-	// if (all_chars == chars) cout << "OK" << endl;
+	// par_write_bits_chunks(compressed_chunks, "./outputs/output2");
 
 	return 0;
 }

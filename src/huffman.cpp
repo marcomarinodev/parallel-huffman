@@ -53,16 +53,16 @@ min_heap_node *build_huffman_tree(map<char, int> chars_count)
     return top;
 }
 
-map<char, string> build_encoding_table(min_heap_node *huffman_tree)
+unordered_map<char, string> build_encoding_table(min_heap_node *huffman_tree)
 {
-    map<char, string> encoding_table;
+    unordered_map<char, string> encoding_table;
 
     store_codes(encoding_table, huffman_tree, "", 0);
 
     return encoding_table;
 }
 
-void store_codes(map<char, string> &encoding_table, min_heap_node *huffman_tree, string code, int index)
+void store_codes(unordered_map<char, string> &encoding_table, min_heap_node *huffman_tree, string code, int index)
 {
     if (huffman_tree == NULL)
         return;
