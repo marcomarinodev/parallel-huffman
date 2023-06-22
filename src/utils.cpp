@@ -78,7 +78,7 @@ void par_write_file_string(const string &filename, const string &data, int num_t
     file.close();
     file.open(filename, ios::binary | ios::app);
 
-    auto write_file_string_worker = [&](const string& data, streampos start)
+    auto write_file_string_worker = [&](const string &data, streampos start)
     {
         lock_guard<mutex> lock(file_mtx);
         file.seekp(start);
@@ -103,36 +103,100 @@ void par_write_file_string(const string &filename, const string &data, int num_t
     file.close();
 }
 
-vector<vector<bitset<8>>> par_compress(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+void seq_write_file_string(const string &filename, const string &data)
 {
-    const int num_threads = 2;
-    vector<vector<bitset<8>>> compressed_chunks(num_threads);
-    mutex mtx;
-    condition_variable cv;
-    atomic<int> processed_chunks(0);
-    atomic<bool> all_chunks_processed(false);
+    ofstream file(filename, ios::out);
+    file << data;
+    file.close();
+}
 
-    auto compress_chunk_worker = [&](int index)
+string bitset_vector_to_string(const vector<bitset<8>> &vec)
+{
+    string result;
+    for (const auto &bs : vec)
+        result += bs.to_string() + '\n';
+
+    return result;
+}
+
+// vector<bitset<8>> ff_compress(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+// {
+
+// }
+
+// string par_encoder(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+// {
+//     for (auto c : chars)
+//     {
+
+//     }
+// }
+
+vector<bitset<8>> seq_encode(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+{
+    string code_buffer;
+    vector<bitset<8>> compressed_chunk;
+
+    for (int i = 0; i < chars.size(); i++)
+    {
+        try
+        {
+            string code = encoding_table.at(chars[i]);
+            code_buffer += code;
+
+            // cout << "[seq_encode]: code_buffer = " << code_buffer << endl;
+
+            while (code_buffer.size() >= 8)
+            {
+                bitset<8> bits(code_buffer.substr(0, 8));
+                compressed_chunk.push_back(bits);
+                code_buffer = code_buffer.substr(8);
+            }
+        }
+        catch (const out_of_range &e)
+        {
+            cerr << "Exception at " << e.what() << endl;
+        }
+    }
+
+    return compressed_chunk;
+}
+
+vector<bitset<8>> produce_encoded_bitset(string encoded_string)
+{
+    size_t string_size = encoded_string.size();
+    size_t num_chunks = string_size / 8 + (string_size % 8 != 0);
+    vector<bitset<8>> byte_chunks;
+    byte_chunks.reserve(num_chunks);
+
+    for (size_t i = 0; i < string_size; i += 8)
+    {
+        bitset<8> bits(encoded_string.substr(i, 8));
+        byte_chunks.push_back(bits);
+    }
+
+    return byte_chunks;
+}
+
+string par_encode(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+{
+    const int num_threads = 4;
+    vector<string> encoded_chunks(num_threads);
+
+    auto encode_chunk_worker = [&](int index)
     {
         int chunk_size = chars.size() / num_threads;
         int start_index = index * chunk_size;
-        int end_index = (index == num_threads - 1) ? chars.size() - 1 : start_index + chunk_size;
-        string code_buffer;
-        vector<bitset<8>> compressed_chunk;
+        int end_index = (index == num_threads - 1) ? chars.size() - 1 : start_index + chunk_size - 1;
+
+        string encoded_chunk;
 
         for (int i = start_index; i <= end_index; i++)
         {
             try
             {
                 string code = encoding_table.at(chars[i]);
-                code_buffer += code;
-
-                while (code_buffer.size() >= 8)
-                {
-                    bitset<8> bits(code_buffer.substr(0, 8));
-                    compressed_chunk.push_back(bits);
-                    code_buffer = code_buffer.substr(8);
-                }
+                encoded_chunk += code;
             }
             catch (const out_of_range &e)
             {
@@ -140,32 +204,23 @@ vector<vector<bitset<8>>> par_compress(const vector<char> &chars, const unordere
             }
         }
 
-        // locking compressed_chunks
-        unique_lock<mutex> lock(mtx);
-        compressed_chunks[index] = compressed_chunk;
-        processed_chunks++;
-
-        if (processed_chunks == num_threads)
-        {
-            all_chunks_processed = true;
-            cv.notify_all();
-        }
-        else
-        {
-            cv.wait(lock, [&]()
-                    { return all_chunks_processed.load(); });
-        }
+        // now you have a string with encoded bits
+        encoded_chunks[index] = encoded_chunk;
     };
 
     vector<thread> encoding_threads;
 
     for (int i = 0; i < num_threads; i++)
-        encoding_threads.emplace_back(compress_chunk_worker, i);
+        encoding_threads.emplace_back(encode_chunk_worker, i);
 
     for (auto &thread : encoding_threads)
         thread.join();
 
-    return compressed_chunks;
+    string encoded_result;
+    for (const auto &chunk : encoded_chunks)
+        encoded_result += chunk;
+
+    return encoded_result;
 }
 
 void par_write_bits_chunks(vector<vector<bitset<8>>> compressed_chunks, const string &output_file)
@@ -197,19 +252,16 @@ void par_write_bits_chunks(vector<vector<bitset<8>>> compressed_chunks, const st
     out_file.close();
 }
 
-void seq_write_bits_chunks(vector<vector<bitset<8>>> compressed_chunks, const string &output_file)
+void write_bitset(const vector<bitset<8>> &vec, const string &filename)
 {
-    ofstream out_file(output_file, ios::binary | ios::app);
-
-    for (const auto &chunk : compressed_chunks)
+    ofstream outfile(filename, ios::out | ios::binary);
+    for (const auto &b : vec)
     {
-        for (const auto &bits : chunk)
-            out_file.put(static_cast<unsigned char>(bits.to_ulong()));
+        unsigned long i = b.to_ulong();
+        outfile.write(reinterpret_cast<const char *>(&i), sizeof(i));
     }
-    
-    out_file.close();
+    outfile.close();
 }
-
 
 void active_wait(int usecs)
 {
@@ -260,8 +312,23 @@ string vec_to_string(vector<char> vec)
     return str;
 }
 
-void print_string_vector(vector<std::string> vec)
+void print_string_vector(vector<string> vec)
 {
     for (const auto &str : vec)
-        cout << str << std::endl;
+        cout << str << endl;
+}
+
+void append_to_csv(const vector<long> &data, const string &filename)
+{
+    ofstream file;
+    file.open(filename, std::ios::app);
+    for (int i = 0; i < data.size(); i++)
+    {
+        if (i < data.size() - 1)
+            file << data[i] << ',';
+        else
+            file << data[i];
+    }
+    file << '\n';
+    file.close();
 }

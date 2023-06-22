@@ -33,8 +33,10 @@
 main
 output
 
-# vscode
+# ides
 .vscode
+.vs
+.idea
 
 # node modules
 node_modules
@@ -55,3 +57,5 @@ _deps
 
 # fastflow
 fastflow
+
+asx

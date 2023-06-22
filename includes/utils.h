@@ -20,6 +20,9 @@
 #include <list>
 #include <bitset>
 
+#include <ff/ff.hpp>
+#include <ff/parallel_for.hpp>
+
 #define START(timename) auto timename = std::chrono::system_clock::now();
 #define STOP(timename, elapsed) auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - timename).count();
 
@@ -66,11 +69,19 @@ std::vector<char> par_read_file(const std::string& filename, int num_threads);
 
 void par_write_file_string(const std::string &filename, const std::string &data, int num_threads);
 
-std::vector<std::vector<std::bitset<8>>> par_compress(const std::vector<char> &chars, const std::unordered_map<char, std::string> &encoding_table);
+void seq_write_file_string(const std::string& filename, const std::string& data);
+
+std::string bitset_vector_to_string(const std::vector<std::bitset<8>> &vec);
+
+std::vector<std::bitset<8>> seq_encode(const std::vector<char> &chars, const std::unordered_map<char, std::string> &encoding_table);
+
+std::vector<std::bitset<8>> produce_encoded_bitset(std::string encoded_string);
+
+std::string par_encode(const std::vector<char> &chars, const std::unordered_map<char, std::string> &encoding_table);
 
 void par_write_bits_chunks(std::vector<std::vector<std::bitset<8>>> compressed_chunks, const std::string &output_file);
 
-void seq_write_bits_chunks(std::vector<std::vector<std::bitset<8>>> compressed_chunks, const std::string &output_file);
+void write_bitset(const std::vector<std::bitset<8>>& vec, const std::string& filename);
 
 void active_wait(int usecs);
 
@@ -84,5 +95,7 @@ void print_ascii_html_value(char c);
 std::string vec_to_string(std::vector<char> vec);
 
 void print_string_vector(std::vector<std::string> vec);
+
+void append_to_csv(const std::vector<long>& data, const std::string& filename);
 
 #endif // PARALLEL_DISTRIB_COMPUTING_UTILS_H
