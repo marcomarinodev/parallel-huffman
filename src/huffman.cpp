@@ -66,7 +66,7 @@ void store_codes(unordered_map<char, string> &encoding_table, min_heap_node *huf
 {
     if (huffman_tree == NULL)
         return;
-    if (huffman_tree->data != INTERNAL_NODE_SYMBOL)
+    if (!huffman_tree->left && !huffman_tree->right)
         encoding_table[huffman_tree->data] = code;
 
     index++;

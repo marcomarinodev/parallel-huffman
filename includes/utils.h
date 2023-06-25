@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <list>
 #include <bitset>
+#include <map>
 
 #include <ff/ff.hpp>
 #include <ff/parallel_for.hpp>
@@ -73,11 +74,17 @@ void seq_write_file_string(const std::string& filename, const std::string& data)
 
 std::string bitset_vector_to_string(const std::vector<std::bitset<8>> &vec);
 
-std::vector<std::bitset<8>> seq_encode(const std::vector<char> &chars, const std::unordered_map<char, std::string> &encoding_table);
+std::string seq_encode_string(const std::vector<char> &chars, const std::unordered_map<char, std::string> &encoding_table);
+
+std::vector<std::bitset<8>> seq_encode_bitset(const std::vector<char> &chars, const std::unordered_map<char, std::string> &encoding_table);
 
 std::vector<std::bitset<8>> produce_encoded_bitset(std::string encoded_string);
 
 std::string par_encode(const std::vector<char> &chars, const std::unordered_map<char, std::string> &encoding_table);
+
+std::map<char, int> par_count_chars(const std::vector<char>& chars);
+
+std::map<char, int> count_chars(const std::vector<char>& chars);
 
 void par_write_bits_chunks(std::vector<std::vector<std::bitset<8>>> compressed_chunks, const std::string &output_file);
 

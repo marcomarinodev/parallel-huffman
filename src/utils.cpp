@@ -119,20 +119,27 @@ string bitset_vector_to_string(const vector<bitset<8>> &vec)
     return result;
 }
 
-// vector<bitset<8>> ff_compress(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
-// {
+string seq_encode_string(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+{
+    string encoded_string;
+    for (int i = 0; i < chars.size(); i++)
+    {
+        try
+        {
+            string code = encoding_table.at(chars[i]);
+            encoded_string += code;
+        }
+        catch (const out_of_range &e)
+        {
+            cout << "Char is: " << chars[i] << endl;
+            cerr << "Exception at " << e.what() << endl;
+        }
+    }
 
-// }
+    return encoded_string;
+}
 
-// string par_encoder(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
-// {
-//     for (auto c : chars)
-//     {
-
-//     }
-// }
-
-vector<bitset<8>> seq_encode(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+vector<bitset<8>> seq_encode_bitset(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
 {
     string code_buffer;
     vector<bitset<8>> compressed_chunk;
@@ -144,7 +151,7 @@ vector<bitset<8>> seq_encode(const vector<char> &chars, const unordered_map<char
             string code = encoding_table.at(chars[i]);
             code_buffer += code;
 
-            // cout << "[seq_encode]: code_buffer = " << code_buffer << endl;
+            // cout << "[seq_encode_bitset]: code_buffer = " << code_buffer << endl;
 
             while (code_buffer.size() >= 8)
             {
@@ -155,7 +162,7 @@ vector<bitset<8>> seq_encode(const vector<char> &chars, const unordered_map<char
         }
         catch (const out_of_range &e)
         {
-            cerr << "Exception at " << e.what() << endl;
+            cerr << "[SEQ] Exception at " << e.what() << endl;
         }
     }
 
@@ -180,7 +187,7 @@ vector<bitset<8>> produce_encoded_bitset(string encoded_string)
 
 string par_encode(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
 {
-    const int num_threads = 4;
+    const int num_threads = thread::hardware_concurrency();
     vector<string> encoded_chunks(num_threads);
 
     auto encode_chunk_worker = [&](int index)
@@ -200,7 +207,7 @@ string par_encode(const vector<char> &chars, const unordered_map<char, string> &
             }
             catch (const out_of_range &e)
             {
-                cerr << "Exception at " << e.what() << endl;
+                cerr << "[PAR] Exception at " << e.what() << endl;
             }
         }
 
@@ -221,6 +228,49 @@ string par_encode(const vector<char> &chars, const unordered_map<char, string> &
         encoded_result += chunk;
 
     return encoded_result;
+}
+
+map<char, int> par_count_chars(const vector<char>& chars)
+{
+    int num_threads = thread::hardware_concurrency();
+    int chunk_size = chars.size() / num_threads;
+    vector<thread> threads;
+    map<char, int> counts;
+    mutex counts_mtx;
+
+    auto worker = [&](int index)
+    {
+        int start = index * chunk_size;
+        int end = index == num_threads - 1 ? chars.size() : start + chunk_size;
+        map<char, int> local_counts;
+        
+        for (int i = start; i < end; i++)
+        {
+           local_counts[chars[i]]++;
+        }
+
+        // locking the shared map
+        lock_guard<mutex> lock(counts_mtx);
+        for (const auto& pair: local_counts)
+            counts[pair.first] += pair.second;
+    };
+
+
+    for (int i = 0; i < num_threads; i++)
+        threads.emplace_back(worker, i);
+    
+    for (auto& t: threads) 
+        t.join();
+
+    return counts;
+}
+
+map<char, int> count_chars(const vector<char>& chars)
+{
+    map<char, int> counts;
+    for (char c : chars) 
+        counts[c]++;
+    return counts;
 }
 
 void par_write_bits_chunks(vector<vector<bitset<8>>> compressed_chunks, const string &output_file)

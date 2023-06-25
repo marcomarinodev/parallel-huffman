@@ -68,3 +68,81 @@ void test_parallel_bitset_write()
   ASSERT_TRUE(contents2 == hex_chunks2);
   in_file2.close();
 }
+
+void test_fastflow_encoding()
+{
+  vector<char> chars = generate_random_ascii(1000);
+  map<char, int> par_map_chars, seq_map_chars;
+
+  // parallel counting
+  ff::ParallelForReduce<map<char, int>> count_par_for;
+
+  count_par_for.parallel_reduce(
+      par_map_chars, map<char, int>(), 0, chars.size(), 1,
+      [&](const long i, map<char, int> &sub_result)
+      {
+        sub_result[chars[i]]++;
+      },
+      [](map<char, int> &result, const map<char, int> &sub_result)
+      {
+        for (const auto &[key, value] : sub_result)
+          result[key] += value;
+      });
+
+  // sequential counting
+  seq_map_chars = count_chars(chars);
+
+  ASSERT_TRUE(par_map_chars == seq_map_chars);
+
+  // build encoding table
+  min_heap_node *huffman_tree = build_huffman_tree(par_map_chars);
+	unordered_map<char, string> encoding_table = build_encoding_table(huffman_tree);
+
+  // parallel encoding
+  string par_encoded_string = par_encode(chars, encoding_table);
+
+  // sequential encoding
+  string seq_encoded_string = seq_encode_string(chars, encoding_table);
+
+  ASSERT_TRUE_MSG(par_encoded_string == seq_encoded_string, "test fastflow encoding - PASSED");
+} 
+
+void test_native_threads_encoding()
+{
+  vector<char> chars = generate_random_ascii(1000);
+  map<char, int> par_map_chars, par_map_gmr_chars, seq_map_chars;
+  int map_nw = thread::hardware_concurrency();
+  int red_nw = map_nw / 2;
+  Asx3 asx3(map_nw, red_nw);
+
+  par_map_chars = par_count_chars(chars);
+  par_map_gmr_chars = asx3.par_gmr<char, int, char>(chars, map_nw, red_nw);
+  seq_map_chars = count_chars(chars);  
+
+  ASSERT_TRUE(par_map_chars == seq_map_chars);
+  ASSERT_TRUE(par_map_gmr_chars == seq_map_chars);
+
+  // build encoding table
+  min_heap_node *huffman_tree = build_huffman_tree(par_map_chars);
+	unordered_map<char, string> encoding_table = build_encoding_table(huffman_tree);
+
+  // parallel encoding
+  string par_encoded_string = par_encode(chars, encoding_table);
+
+  // sequential encoding
+  string seq_encoded_string = seq_encode_string(chars, encoding_table);
+
+  ASSERT_TRUE_MSG(par_encoded_string == seq_encoded_string, "test native threads encoding - PASSED");
+}
+
+// helpers
+vector<char> generate_random_ascii(int length) {
+  std::vector<char> result;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 128);
+    for (int i = 0; i < length; i++) {
+        result.push_back(static_cast<char>(dis(gen)));
+    }
+    return result;
+}
