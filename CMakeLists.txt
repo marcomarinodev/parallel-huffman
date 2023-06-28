@@ -5,7 +5,7 @@ project(parallel_distrib_computing)
 
 set(CMAKE_CXX_STANDARD 17)
 set(EXEC output)
-set(CMAKE_CXX_FLAGS "-I/home/mamarino/fastflow -O3 -Wall -pthread -pedantic")
+set(CMAKE_CXX_FLAGS "-I/home/mamarino/fastflow -O3 -Wall -pthread -pedantic -DDEBUG")
 
 include_directories(includes)
 

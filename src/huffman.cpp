@@ -57,20 +57,18 @@ unordered_map<char, string> build_encoding_table(min_heap_node *huffman_tree)
 {
     unordered_map<char, string> encoding_table;
 
-    store_codes(encoding_table, huffman_tree, "", 0);
+    store_codes(encoding_table, huffman_tree, "");
 
     return encoding_table;
 }
 
-void store_codes(unordered_map<char, string> &encoding_table, min_heap_node *huffman_tree, string code, int index)
+void store_codes(unordered_map<char, string> &encoding_table, min_heap_node *huffman_tree, string code)
 {
     if (huffman_tree == NULL)
         return;
     if (!huffman_tree->left && !huffman_tree->right)
         encoding_table[huffman_tree->data] = code;
 
-    index++;
-
-    store_codes(encoding_table, huffman_tree->left, code + "0", index);
-    store_codes(encoding_table, huffman_tree->right, code + "1", index);
+    store_codes(encoding_table, huffman_tree->left, code + "0");
+    store_codes(encoding_table, huffman_tree->right, code + "1");
 }
