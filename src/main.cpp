@@ -19,140 +19,137 @@
 
 using namespace std;
 
+enum mode
+{
+	seq = 0,
+	nt_par = 1,
+	ff_par
+};
+
 int main(int argc, char *argv[])
 {
 
 	bool perform_tests = argc > 1 ? strcmp(argv[1], "test") == 0 : false;
 	int test_input_size = argc > 2 ? atoi(argv[2]) : 1000;
+	int mode = argc > 3 ? atoi(argv[3]) : ff_par;
+	bool performance_test = argc > 4 ? strcmp(argv[4], "ptest") == 0 : false;
 
 	vector<string> input_filenames;
-	vector<long> elapsed_times;
+	vector<string> output_filenames;
+	vector<long> elapsed_stage_times;
 
 	cout << "=> Performing tests <=" << endl;
 
-	if (perform_tests) 
+	if (perform_tests)
 	{
 		test_fastflow_encoding(test_input_size);
 		test_native_threads_encoding(test_input_size);
 		return 0;
 	}
 
-	input_filenames.push_back("./inputs/1k");
-	input_filenames.push_back("./inputs/10k");
-	input_filenames.push_back("./inputs/50k");
-	input_filenames.push_back("./inputs/100k");
-	input_filenames.push_back("./inputs/200k");
+	input_filenames.push_back("./inputs/10M");
+	input_filenames.push_back("./inputs/50M");
+	input_filenames.push_back("./inputs/100M");
 
-	for (auto input_filename : input_filenames)
+	output_filenames.push_back("./outputs/seq_perc_stages_s.csv");
+	output_filenames.push_back("./outputs/seq_perc_stages_m.csv");
+	output_filenames.push_back("./outputs/seq_perc_stages_l.csv");
+
+	for (int i = 0; i < input_filenames.size(); i++)
 	{
+		string input_filename = input_filenames[i];
 		cout << "\n========================" << endl;
-		cout << "compressing: " << input_filename << endl;
+		cout << "analyzing: " << input_filename << endl;
 		vector<char> chars;
-		long total_elapsed = 0;
 
 		// FILE READING
-		long seq_file_read_elapsed;
+		chars = read_file(input_filename);
+
+		bool do_parallel_policy = mode == seq ? false : chars.size() > 15 * 1000;
+
+		for (int j = 0; j < 10; j++)
 		{
-			utimer seq_read("seq file read", &seq_file_read_elapsed);
-			chars = read_file(input_filename);
-		}
-		cout << "seq file read computed in: " << seq_file_read_elapsed << endl;
-		total_elapsed += seq_file_read_elapsed;
+			// => COUNTING CHARS <=
+			map<char, int> par_map_chars, seq_map_chars;
 
-		bool do_parallel_policy = chars.size() > 15 * 1000;
-
-		// => COUNTING CHARS <=
-		map<char, int> par_map_chars, seq_map_chars;
-		// [PAR]: parallel google map reduce to count the characters
-		// int map_nw = thread::hardware_concurrency();
-		// int red_nw = map_nw / 2;
-		// Asx3 asx3(map_nw, red_nw);
-
-		if (do_parallel_policy)
-		{
-			cout << "file big => parallel counting" << endl;
-			long par_2threads_word_count_elapsed;
+			if (do_parallel_policy)
 			{
-				utimer par_2threads_words_count("par 2threads words count", &par_2threads_word_count_elapsed);
-				par_map_chars = ff_solution::count_chars(chars);
+				cout << "file big => parallel counting" << endl;
+				long par_word_count_elapsed;
+				{
+					utimer par_words_count("par words count", &par_word_count_elapsed);
+
+					if (mode == nt_par)
+						par_map_chars = nt_solution::count_chars(chars);
+					else
+						par_map_chars = ff_solution::count_chars(chars);
+				}
+				cout << "par words count computed in: " << par_word_count_elapsed << endl;
+				elapsed_stage_times.push_back(par_word_count_elapsed);
 			}
-			cout << "par 2threads words count computed in: " << par_2threads_word_count_elapsed << endl;
-			total_elapsed += par_2threads_word_count_elapsed;
-		}
-		else
-		{
-			cout << "file small => sequential counting" << endl;
-			long seq_words_count_elapsed;
+			else
 			{
-				utimer seq_words_count("seq words count", &seq_words_count_elapsed);
-				seq_map_chars = seq_solution::count_chars(chars);
+				cout << "file small => sequential counting" << endl;
+				long seq_words_count_elapsed;
+				{
+					utimer seq_words_count("seq words count", &seq_words_count_elapsed);
+					seq_map_chars = seq_solution::count_chars(chars);
+				}
+				cout << "seq words count computed in: " << seq_words_count_elapsed << endl;
+				elapsed_stage_times.push_back(seq_words_count_elapsed);
 			}
-			cout << "seq words count computed in: " << seq_words_count_elapsed << endl;
-			total_elapsed += seq_words_count_elapsed;
-		}
 
-		// ENCODING TABLE BUILDER
-		min_heap_node *huffman_tree;
-		unordered_map<char, string> encoding_table;
-		long build_encoding_table_elasped;
-		{
-			utimer t_build_encoding_table("build encoding table", &build_encoding_table_elasped);
-			huffman_tree = build_huffman_tree(do_parallel_policy ? par_map_chars : seq_map_chars);
-			encoding_table = build_encoding_table(huffman_tree);
-		}
-		cout << "build encoding table computed in: " << build_encoding_table_elasped << endl;
-		total_elapsed += build_encoding_table_elasped;
-
-		// => ENCODING <=
-		if (do_parallel_policy)
-		{
-			cout << "file big => parallel encoding" << endl;
-			// [PAR]: parallel encoding
-			/*
-			 *                        +-----------+
-			 *                        |           |
-			 *              +-------->| Encoder 1 +------+
-			 *              |         |           |      |
-			 *              |         +-----------+      |
-			 *              |                            |
-			 *              |              *             v
-			 * ------------>|              *       [[0,1,...,], ..., [1,0,...,]]
-			 *              |              *                              ^
-			 *              |                                             |
-			 *              |         +-----------+                       |
-			 *              |         |           |                       |
-			 *              +-------->| Encoder N +-----------------------+
-			 *                        |           |
-			 *                        +-----------+
-			 */
-			long par_encoding_elapsed;
+			// ENCODING TABLE BUILDER
+			min_heap_node *huffman_tree;
+			unordered_map<char, string> encoding_table;
+			long build_encoding_table_elasped;
 			{
-				utimer t_par_encode("par encoding", &par_encoding_elapsed);
-				string par_encoded_string = nt_solution::encode(chars, encoding_table);
-				vector<bitset<8>> par_encoded_bitset = seq_solution::compress(par_encoded_string);
+				utimer t_build_encoding_table("build encoding table", &build_encoding_table_elasped);
+				huffman_tree = build_huffman_tree(do_parallel_policy ? par_map_chars : seq_map_chars);
+				encoding_table = build_encoding_table(huffman_tree);
 			}
-			cout << "[PAR] {ENCODING + COMPRESSION}: " << par_encoding_elapsed << endl;
-			total_elapsed += par_encoding_elapsed;
-		}
-		else
-		{
-			cout << "file small => sequential encoding" << endl;
-			// [SEQ]: sequential encoding
-			long seq_encoding_elapsed;
+			cout << "build encoding table computed in: " << build_encoding_table_elasped << endl;
+			elapsed_stage_times.push_back(build_encoding_table_elasped);
+
+			// => ENCODING <=
+			if (do_parallel_policy)
 			{
-				utimer t_seq_encode("seq encoding", &seq_encoding_elapsed);
-				vector<bitset<8>> seq_encoded_bitset = seq_solution::encode_and_compress(chars, encoding_table);
+				cout << "file big => parallel encoding" << endl;
+				// [PAR]: parallel encoding
+				long par_encoding_elapsed;
+				{
+					utimer t_par_encode("par encoding", &par_encoding_elapsed);
+					string par_encoded_string;
+					if (mode == nt_par)
+						par_encoded_string = nt_solution::encode(chars, encoding_table);
+					else
+						par_encoded_string = ff_solution::encode(chars, encoding_table);
+
+					vector<bitset<8>> par_encoded_bitset = seq_solution::compress(par_encoded_string);
+				}
+				cout << "[PAR] {ENCODING + COMPRESSION}: " << par_encoding_elapsed << endl;
+				elapsed_stage_times.push_back(par_encoding_elapsed);
 			}
-			cout << "[SEQ] {ENCODING + COMRPESSION}" << seq_encoding_elapsed << endl;
-			total_elapsed += seq_encoding_elapsed;
+			else
+			{
+				cout << "file small => sequential encoding" << endl;
+				// [SEQ]: sequential encoding
+				long seq_encoding_elapsed;
+				{
+					utimer t_seq_encode("seq encoding", &seq_encoding_elapsed);
+					vector<bitset<8>> seq_encoded_bitset = seq_solution::encode_and_compress(chars, encoding_table);
+				}
+				cout << "[SEQ] {ENCODING + COMRPESSION}" << seq_encoding_elapsed << endl;
+				elapsed_stage_times.push_back(seq_encoding_elapsed);
+			}
+
+			string filename_to_append = output_filenames[i];
+
+			append_to_csv(elapsed_stage_times, filename_to_append);
+
+			elapsed_stage_times.clear();
 		}
-
-		// par_write_bits_chunks(compressed_chunks, "./outputs/output2");
-
-		elapsed_times.push_back(total_elapsed);
 	}
-
-	append_to_csv(elapsed_times, "./outputs/seq2_results.csv");
 
 	return 0;
 }
