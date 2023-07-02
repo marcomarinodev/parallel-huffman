@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
 	input_filenames.push_back("./inputs/50M");
 	input_filenames.push_back("./inputs/100M");
 
-	output_filenames.push_back("./outputs/nt_par_s.csv");
-	output_filenames.push_back("./outputs/nt_par_m.csv");
-	output_filenames.push_back("./outputs/nt_par_l.csv");
+	output_filenames.push_back("./outputs/ff_par_s.csv");
+	output_filenames.push_back("./outputs/ff_par_m.csv");
+	output_filenames.push_back("./outputs/ff_par_l.csv");
 
 	nums_threads.push_back(1);
 	nums_threads.push_back(2);
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 						if (mode == nt_par)
 							par_encoded_string = nt_solution::encode(chars, encoding_table, num_thread);
 						else
-							par_encoded_string = ff_solution::encode(chars, encoding_table);
+							par_encoded_string = ff_solution::encode(chars, encoding_table, num_thread);
 
 						vector<bitset<8>> par_encoded_bitset = seq_solution::compress(par_encoded_string);
 					}

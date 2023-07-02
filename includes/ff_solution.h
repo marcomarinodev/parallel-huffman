@@ -28,8 +28,9 @@ namespace ff_solution
   /// @brief encode chars using huffman encoding algorithm
   /// @param encoding_table huffman encoding table
   /// @param chars input
+  /// @param num_threads
   /// @return encoded input
-  string encode(vector<char> chars, unordered_map<char, string> encoding_table);
+  string encode(vector<char> chars, unordered_map<char, string> encoding_table, int num_threads);
 }
 
 #endif

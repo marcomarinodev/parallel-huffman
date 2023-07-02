@@ -84,7 +84,7 @@ void test_fastflow_encoding(int input_size)
 	unordered_map<char, string> encoding_table = build_encoding_table(huffman_tree);
 
   // fastflow encoding
-  string par_encoded_string = ff_solution::encode(chars, encoding_table);
+  string par_encoded_string = ff_solution::encode(chars, encoding_table, thread::hardware_concurrency());
   
   // sequential encoding
   string seq_encoded_string = seq_solution::encode(chars, encoding_table);

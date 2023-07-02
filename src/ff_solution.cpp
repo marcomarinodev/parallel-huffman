@@ -32,11 +32,11 @@ map<char, int> ff_solution::count_chars(vector<char> chars)
   return par_map_chars;
 }
 
-string ff_solution::encode(vector<char> chars, unordered_map<char, string> encoding_table)
+string ff_solution::encode(vector<char> chars, unordered_map<char, string> encoding_table, int num_threads)
 {
   string par_encoded_string;
   vector<string> encoded_vector(chars.size());
-  ff::ParallelFor pf(thread::hardware_concurrency());
+  ff::ParallelFor pf(num_threads);
   long ff_par_encoding_elapsed;
 
   {
