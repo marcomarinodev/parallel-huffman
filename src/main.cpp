@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
 	input_filenames.push_back("./inputs/50M");
 	input_filenames.push_back("./inputs/100M");
 
-	output_filenames.push_back("./outputs/ff_par_s.csv");
-	output_filenames.push_back("./outputs/ff_par_m.csv");
-	output_filenames.push_back("./outputs/ff_par_l.csv");
+	output_filenames.push_back("./outputs/nt_par_s.csv");
+	output_filenames.push_back("./outputs/nt_par_m.csv");
+	output_filenames.push_back("./outputs/nt_par_l.csv");
 
 	nums_threads.push_back(1);
 	nums_threads.push_back(2);
@@ -95,7 +95,8 @@ int main(int argc, char *argv[])
 
 						if (mode == nt_par)
 						// google map reduce
-							par_map_chars = nt_solution::Gmr(num_thread, num_thread / 2 + 1).count_chars(chars);
+							// par_map_chars = nt_solution::Gmr(num_thread, num_thread / 2 + 1).count_chars(chars);
+							par_map_chars = nt_solution::count_chars(chars, num_thread);
 						else
 							par_map_chars = ff_solution::count_chars(chars);
 					}
