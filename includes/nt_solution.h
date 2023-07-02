@@ -22,7 +22,7 @@ namespace nt_solution
   /// of that character.
   /// @param chars vector of characters
   /// @return map of <character, occurrences>
-  map<char, int> count_chars(const vector<char>& chars);
+  map<char, int> count_chars(const vector<char>& chars, int num_threads);
 
   class Gmr
   {
@@ -48,7 +48,7 @@ namespace nt_solution
   /// @param chars input characters
   /// @param encoding_table huffman encoding table
   /// @return string version of the input encoding
-  string encode(const vector<char>& chars, const unordered_map<char, string> &encoding_table);
+  string encode(const vector<char>& chars, const unordered_map<char, string> &encoding_table, int num_threads);
 
 }
 

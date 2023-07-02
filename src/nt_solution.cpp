@@ -2,13 +2,12 @@
 
 using namespace std;
 
-map<char, int> nt_solution::count_chars(const vector<char> &chars)
+map<char, int> nt_solution::count_chars(const vector<char> &chars, int num_threads)
 {
     map<char, int> counts;
     long par_count_chars_elapsed;
     {
         utimer par_count_chars_timer("par count chars timer", &par_count_chars_elapsed);
-        int num_threads = thread::hardware_concurrency();
         int chunk_size = chars.size() / num_threads;
         vector<thread> threads;
 
@@ -152,13 +151,12 @@ map<char, int> nt_solution::Gmr::count_chars(vector<char> input)
     return reducers_result;
 }
 
-string nt_solution::encode(const vector<char> &chars, const unordered_map<char, string> &encoding_table)
+string nt_solution::encode(const vector<char> &chars, const unordered_map<char, string> &encoding_table, int num_threads)
 {
     string encoded_result;
     long par_encoding_elapsed;
     {
         utimer par_encoding_timer("par encoding timer", &par_encoding_elapsed);
-        const int num_threads = thread::hardware_concurrency();
         vector<string> encoded_chunks(num_threads);
 
         auto encode_chunk_worker = [&](int index)

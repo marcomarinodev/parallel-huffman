@@ -102,7 +102,7 @@ void test_native_threads_encoding(int input_size)
   int map_nw = thread::hardware_concurrency();
   int red_nw = map_nw / 2;
 
-  par_map_chars = nt_solution::count_chars(chars);
+  par_map_chars = nt_solution::count_chars(chars, thread::hardware_concurrency());
   par_map_gmr_chars = nt_solution::Gmr(map_nw, red_nw).count_chars(chars);
   seq_map_chars = seq_solution::count_chars(chars);  
 
@@ -113,7 +113,7 @@ void test_native_threads_encoding(int input_size)
 	unordered_map<char, string> encoding_table = build_encoding_table(huffman_tree);
 
   // parallel encoding
-  string par_encoded_string = nt_solution::encode(chars, encoding_table);
+  string par_encoded_string = nt_solution::encode(chars, encoding_table, thread::hardware_concurrency());
 
   // sequential encoding
   string seq_encoded_string = seq_solution::encode(chars, encoding_table);
