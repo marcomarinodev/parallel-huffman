@@ -54,16 +54,19 @@ int main(int argc, char *argv[])
 	input_filenames.push_back("./inputs/50M");
 	input_filenames.push_back("./inputs/100M");
 
-	output_filenames.push_back("./outputs/nt_par_s.csv");
-	output_filenames.push_back("./outputs/nt_par_m.csv");
-	output_filenames.push_back("./outputs/nt_par_l.csv");
+	// output_filenames.push_back("./outputs/nt_par_s.csv");
+	// output_filenames.push_back("./outputs/nt_par_m.csv");
+	// output_filenames.push_back("./outputs/nt_par_l.csv");
+	output_filenames.push_back("./outputs/seq_results_s.csv");
+	output_filenames.push_back("./outputs/seq_results_m.csv");
+	output_filenames.push_back("./outputs/seq_results_l.csv");
 
 	nums_threads.push_back(1);
-	nums_threads.push_back(2);
-	nums_threads.push_back(4);
-	nums_threads.push_back(8);
-	nums_threads.push_back(16);
-	nums_threads.push_back(32);
+	// nums_threads.push_back(2);
+	// nums_threads.push_back(4);
+	// nums_threads.push_back(8);
+	// nums_threads.push_back(16);
+	// nums_threads.push_back(32);
 
 	for (int i = 0; i < input_filenames.size(); i++)
 	{
@@ -80,6 +83,7 @@ int main(int argc, char *argv[])
 		for (auto num_thread : nums_threads)
 		{
 			long par_compute_time_avg = 0;
+			long seq_compute_time_avg = 0;
 
 			for (int j = 0; j < 10; j++)
 			{
@@ -113,6 +117,7 @@ int main(int argc, char *argv[])
 						seq_map_chars = seq_solution::count_chars(chars);
 					}
 					cout << "seq words count computed in: " << seq_words_count_elapsed << endl;
+					seq_compute_time_avg += seq_words_count_elapsed;
 					elapsed_stage_times.push_back(seq_words_count_elapsed);
 				}
 
@@ -126,6 +131,7 @@ int main(int argc, char *argv[])
 					encoding_table = build_encoding_table(huffman_tree);
 				}
 				cout << "build encoding table computed in: " << build_encoding_table_elasped << endl;
+				seq_compute_time_avg += build_encoding_table_elasped;
 				elapsed_stage_times.push_back(build_encoding_table_elasped);
 				par_compute_time_avg += build_encoding_table_elasped;
 
@@ -159,17 +165,16 @@ int main(int argc, char *argv[])
 						vector<bitset<8>> seq_encoded_bitset = seq_solution::encode_and_compress(chars, encoding_table);
 					}
 					cout << "[SEQ] {ENCODING + COMRPESSION}" << seq_encoding_elapsed << endl;
-					elapsed_stage_times.push_back(seq_encoding_elapsed);
+					seq_compute_time_avg += seq_encoding_elapsed;
 				}
-
-				// append_to_csv(elapsed_stage_times, filename_to_append);
-
+				
 				elapsed_stage_times.clear();
 			}
 
-			par_compute_time_avg /= 10;
-			par_computing_time_avgs.push_back(par_compute_time_avg);
-			
+			seq_compute_time_avg /= 10;
+			// par_compute_time_avg /= 10;
+			// par_computing_time_avgs.push_back(par_compute_time_avg);
+			par_computing_time_avgs.push_back(seq_compute_time_avg);
 		}
 
 		string filename_to_append = output_filenames[i];
