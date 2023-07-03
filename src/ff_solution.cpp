@@ -2,7 +2,7 @@
 
 using namespace std;
 
-map<char, int> ff_solution::count_chars(vector<char> chars)
+map<char, int> ff_solution::count_chars(vector<char> chars, int num_threads)
 {
   map<char, int> par_map_chars;
 
@@ -22,7 +22,7 @@ map<char, int> ff_solution::count_chars(vector<char> chars)
         {
           for (const auto &[key, value] : sub_result)
             result[key] += value;
-        });
+        }, num_threads);
   }
 
 #ifdef DEBUG
@@ -41,7 +41,7 @@ string ff_solution::encode(vector<char> chars, unordered_map<char, string> encod
 
   {
     utimer ff_par_encoding("ff par encoding", &ff_par_encoding_elapsed);
-    pf.parallel_for(0, chars.size(), 1, 0, [&encoded_vector, encoding_table, chars](const long i)
+    pf.parallel_for(0, chars.size(), [&encoded_vector, encoding_table, chars](const long i)
                     {
       try 
       {
@@ -51,18 +51,15 @@ string ff_solution::encode(vector<char> chars, unordered_map<char, string> encod
       catch (const out_of_range &e)
       {
         cerr << "[FF] Exception at " << e.what() << endl;
-      } });
+      } }, num_threads);
 
-    size_t totalSize = 0;
-    for (const auto &str : encoded_vector)
-    {
-      totalSize += str.size();
-    }
+      // 8407232
+
+    size_t totalSize = chars.size() * 8;
     par_encoded_string.reserve(totalSize);
+
     for (const auto &str : encoded_vector)
-    {
-      par_encoded_string += str;
-    }
+      par_encoded_string.append(str);
   }
 
 #ifdef DEBUG

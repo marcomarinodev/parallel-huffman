@@ -72,7 +72,7 @@ void test_fastflow_encoding(int input_size)
   vector<char> chars = generate_random_ascii(input_size);
   
   // fastflow counting
-  map<char, int> par_map_chars = ff_solution::count_chars(chars);
+  map<char, int> par_map_chars = ff_solution::count_chars(chars, thread::hardware_concurrency());
 
   // sequential counting
   map<char, int> seq_map_chars = seq_solution::count_chars(chars);

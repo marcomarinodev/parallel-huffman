@@ -22,7 +22,7 @@ namespace ff_solution
   /// of that character using.
   /// @param chars vector of characters
   /// @return map of <character, occurrences>
-  map<char, int> count_chars(vector<char> chars);
+  map<char, int> count_chars(vector<char> chars, int num_threads);
 
 
   /// @brief encode chars using huffman encoding algorithm
