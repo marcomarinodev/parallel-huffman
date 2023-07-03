@@ -51,16 +51,16 @@ m: 3043096
 l: 6077468
 
 ff_results 8 threads:
-s: 
-m: 
-l: 
+s: 564325
+m: 2782430
+l: 5518873
 
 ff_results 16 threads:
-s: 
-m: 
-l: 
+s: 506217
+m: 2489869
+l: 4985412
 
 ff_results 32 threads:
-s: 
-m: 
-l: 
+s: 470083
+m: 2347214
+l: 4640515
