@@ -1,0 +1,66 @@
+sequential results:
+s: 818129
+m: 4280842
+l: 8554819
+
+========== NT RESULTS ==========
+nt_results 1 thread:
+s: 991965
+m: 5453434
+l: 11369705
+
+nt_results 2 threads:
+s: 591602
+m: 3704533
+l: 6343420
+
+nt_results 4 threads:
+s: 430787
+m: 2404020
+l: 4366054
+
+nt_results 8 threads:
+s: 279434
+m: 1466251
+l: 3495891
+
+nt_results 16 threads:
+s: 214148
+m: 974799
+l: 2521686
+
+nt_results 32 threads:
+s: 198527
+m: 829128
+l: 2158098
+
+========== FF RESULTS ==========
+ff_results 1 thread:
+s: 1175551
+m: 5831148
+l: 11558439
+
+ff_results 2 threads:
+s: 778778
+m: 3928956
+l: 7799152
+
+ff_results 4 threads:
+s: 595902
+m: 3043096
+l: 6077468
+
+ff_results 8 threads:
+s: 
+m: 
+l: 
+
+ff_results 16 threads:
+s: 
+m: 
+l: 
+
+ff_results 32 threads:
+s: 
+m: 
+l: 
