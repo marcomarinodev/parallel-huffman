@@ -24,9 +24,6 @@
 #include <ff/ff.hpp>
 #include <ff/parallel_for.hpp>
 
-#define START(timename) auto timename = std::chrono::system_clock::now();
-#define STOP(timename, elapsed) auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - timename).count();
-
 class utimer
 {
     std::chrono::system_clock::time_point start;

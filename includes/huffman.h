@@ -1,11 +1,11 @@
 #ifndef HUFFMAN_HPP
 #define HUFFMAN_HPP
 
-#include <bits/stdc++.h>
-#include <bitset>
+#define INTERNAL_NODE_SYMBOL '$'
+
 #include "./utils.h"
 
-#define INTERNAL_NODE_SYMBOL '$'
+#include <bits/stdc++.h>
 
 using namespace std;
 

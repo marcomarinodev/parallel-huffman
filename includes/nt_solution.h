@@ -4,13 +4,9 @@
 #define MAP_NW 2
 #define RED_NW 2
 
-#include <iostream>
-#include <map>
-#include <thread>
-#include <mutex>
-#include <vector>
-
 #include "./utils.h"
+
+#include <thread>
 
 using namespace std;
 

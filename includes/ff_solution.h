@@ -1,16 +1,10 @@
 #ifndef FF_SOLUTION_H
 #define FF_SOLUTION_H
 
-#include <iostream>
-#include <map>
-#include <unordered_map>
-#include <vector>
-#include <string>
-#include <thread>
-#include <ff/ff.hpp>
-#include <ff/parallel_for.hpp>
-
 #include "./utils.h"
+
+#include <unordered_map>
+#include <thread>
 
 using namespace std;
 

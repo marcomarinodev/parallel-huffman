@@ -7,12 +7,7 @@
 #include "../includes/nt_solution.h"
 #include "../includes/seq_solution.h"
 
-#include <iostream>
-#include <vector>
-#include <bitset>
 #include <random>
-#include <ff/ff.hpp>
-#include <ff/parallel_for.hpp>
 
 #define ASSERT_TRUE_MSG(x, msg) { if (!(x)) std::cout << __FUNCTION__ << " failed on line " << __LINE__ << std::endl; else std::cout << msg << std::endl; }
 #define ASSERT_TRUE(x) { if (!(x)) std::cout << __FUNCTION__ << " failed on line " << __LINE__ << std::endl; }
