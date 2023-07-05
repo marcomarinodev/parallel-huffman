@@ -37,24 +37,24 @@ Recalling that *speedup* is a measure of the improvement in execution time achie
 **Speedup test with 10MB file and `Tseq = `** 
 | par. degree    |   2   |   4   |   8   |  16   |   32 |
 | :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |   |   |   |   |  |
-| fastflow       |   |   |   |   |  |
+| native threads |       |       |       |       |      |
+| fastflow       |       |       |       |       |      |
 
 ![](imgs/su_10.png)
 
 **Speedup test with 50MB file and `Tseq = `**
 | par. degree    |   2   |   4   |   8   |  16   |   32 |
 | :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |   |   |   |   |  |
-| fastflow       |   |   |   |   |  |
+| native threads |       |       |       |       |      |
+| fastflow       |       |       |       |       |      |
 
 ![](imgs/su_50.png)
 
 **Speedup test with 100MB file and `Tseq = `**
 | par. degree    |   2   |   4   |   8   |  16   |   32 |
 | :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |   |   |   |   |  |
-| fastflow       |   |   |   |   |  |
+| native threads |       |       |       |       |      |
+| fastflow       |       |       |       |       |      |
 
 ![](imgs/su_100.png)
 
@@ -63,17 +63,50 @@ Recalling that *speedup* is a measure of the improvement in execution time achie
 **Scalability test with 10MB file** 
 | par. degree    |   2   |   4   |   8   |  16   |   32 |
 | :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |   |   |   |   |  |
-| fastflow       |   |   |   |   |  |
+| native threads |       |       |       |       |      |
+| fastflow       |       |       |       |       |      |
 
 **Scalability test with 50MB file** 
 | par. degree    |   2   |   4   |   8   |  16   |   32 |
 | :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |   |   |   |   |  |
-| fastflow       |   |   |   |   |  |
+| native threads |       |       |       |       |      |
+| fastflow       |       |       |       |       |      |
 
 **Scalability test with 100MB file** 
 | par. degree    |   2   |   4   |   8   |  16   |   32 |
 | :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |   |   |   |   |  |
-| fastflow       |   |   |   |   |  |
+| native threads |       |       |       |       |      |
+| fastflow       |       |       |       |       |      |
+
+
+**Native threads execution times**
+| par. degree |    2    |    4    |    8    |   16    |      32 |
+| :---------- | :-----: | :-----: | :-----: | :-----: | ------: |
+| small       | 591602  | 430787  | 279434  | 214148  |  198527 |
+| medium      | 3704533 | 2404020 | 1466251 | 974799  |  829128 |
+| large       | 6343420 | 4366054 | 3495891 | 2521686 | 2158098 |
+
+**FastFlow execution times**
+| par. degree |    2    |    4    |    8    |   16    |      32 |
+| :---------- | :-----: | :-----: | :-----: | :-----: | ------: |
+| s           | 778778  | 595902  | 564325  | 506217  |  470083 |
+| m           | 3928956 | 3043096 | 2782430 | 2489869 | 2347214 |
+| l           | 7799152 | 6077468 | 5518873 | 4985412 | 4640515 |
+
+### How to run it
+
+##### Performance tests
+
+To create a random 10MB ascii file, just run:
+`base64 /dev/urandom | head -c 10000000 > 10M`
+
+in the inputs file"
+```bash
+total 153M
+-rw-rw-r-- 1 m.marino38 m.marino38 96M Jul  5 19:09 100MB
+-rw-rw-r-- 1 m.marino38 m.marino38 10M Jul  5 19:04 10M
+-rw-rw-r-- 1 m.marino38 m.marino38 48M Jul  5 19:09 50M
+```
+
+To execute the native threads solution using 2 as parallelisation's degree on a 10MB file:
+`./output n 1 2 ./inputs/10M`
