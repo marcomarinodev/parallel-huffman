@@ -55,36 +55,4 @@ string ff_solution::encode(vector<char> chars, unordered_map<char, string> encod
   cout << "[FF] par encoding elapsed: " << ff_par_encoding_elapsed << endl;
 #endif
   return result;
-  //   string par_encoded_string;
-  //   vector<string> encoded_vector(chars.size());
-  //   ff::ParallelFor pf(num_threads);
-  //   long ff_par_encoding_elapsed;
-
-  //   {
-  //     utimer ff_par_encoding("ff par encoding", &ff_par_encoding_elapsed);
-  //     pf.parallel_for(0, chars.size(), chars.size() / num_threads, [&encoded_vector, encoding_table, chars](const long i)
-  //                     {
-  //       try
-  //       {
-  //         string code = encoding_table.at(chars[i]);
-  //         encoded_vector[i] = code;
-  //         // par_encoded_string.append(code);
-  //       }
-  //       catch (const out_of_range &e)
-  //       {
-  //         cerr << "[FF] Exception at " << e.what() << endl;
-  //       } }, num_threads);
-
-  //     size_t totalSize = chars.size() * 8;
-  //     par_encoded_string.reserve(totalSize);
-
-  //     for (const auto &str : encoded_vector)
-  //       par_encoded_string.append(str);
-  //   }
-
-  // #ifdef DEBUG
-  //   cout << "[FF] par encoding elapsed: " << ff_par_encoding_elapsed << endl;
-  // #endif
-
-  //   return par_encoded_string;
 }

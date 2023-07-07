@@ -24,7 +24,7 @@ After conducting an analysis, the following steps were identified as necessary t
 ### Performance tests
 Since the goal of this project was to identify areas for improvement in the sequential solution 
 using parallel computing techniques, I measured the execution time of each stage in the sequential
-solution, enabling the identification of potential candidates for refactoring and enhancement using multithreading. Additionally, I performed performance tests (executed by a machine using an **Intel(R) Xeon(R) Gold 5120 CPU @ 2.20GHz and 32 cores**) on both the parallel implementations (native threads, and **[FastFlow](https://github.com/fastflow/fastflow)** C++ library). 
+solution, enabling the identification of potential candidates for refactoring and enhancement using multithreading. Additionally, I performed performance tests (executed by a machine using a dual socket, 16 cores each, 2 way hyper threading **AMD EPYC 7301**) with both the parallel implementations (native threads, and **[FastFlow](https://github.com/fastflow/fastflow)** C++ library). 
 
 #### Stages performance
 I decided to first benchmark how much each stages takes in the entire process of compression and here's what emerged by measuring the time taken from each stage (excluding the read/write and the actual compression) sequentially with three different file sizes which are `s=10MB`, `m=50MB`, and `l=100MB`:

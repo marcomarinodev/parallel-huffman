@@ -1,7 +1,7 @@
 sequential results:
-small: 724828
-medium: 3310951
-large: 6382589
+s: 724828
+m: 3310951
+l: 6382589
 
 ========== NT RESULTS ==========
 nt_results 1 thread:
@@ -41,36 +41,36 @@ l: 880783
 
 ========== FF RESULTS ==========
 ff_results 1 thread:
-s: 950885
-m: 4382197
-l: 8660605
+s: 567867
+m: 3094010
+l: 6103641
 
 ff_results 2 threads:
-s: 630187
-m: 2880560
-l: 5646337
+s: 372611
+m: 2018948
+l: 3932217
 
 ff_results 4 threads:
-s: 483029
-m: 2093818
-l: 4167505
+s: 216854
+m: 1155247
+l: 2514132
 
 ff_results 8 threads:
-s: 375729
-m: 1975671
-l: 3451109
+s: 185110
+m: 897630
+l: 1659439
 
 ff_results 16 threads:
-s: 436743
-m: 2002872
-l: 3532961
+s: 199613
+m: 778187
+l: 1794738
 
 ff_results 32 threads:
-s: 425463
-m: 1722720
-l: 3395732
+s: 150436
+m: 840813
+l: 1546359
 
 ff_results 64 threads:
-s: 396200
-m: 1760744
-l: 3326109
+s: 155892
+m: 857820
+l: 1817671
