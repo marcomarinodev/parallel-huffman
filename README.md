@@ -41,79 +41,49 @@ The reason why the Huffman tree phase is much quicker is because the tree has an
 ### Speedup and scalability tests
 Recalling that *speedup* is a measure of the improvement in execution time achieved through parallelization and that `speedup(n) = Tseq / Tpar(n)` and *scalability* measures the ability of the system to maintain or improve its performance as the problem size or the number of processing units is scaled up `scalability(n) = Tpar(1) / Tpar(n)`. In the following table there is the speedup table, considering that the sequential time on average `Tseq(s) = 724828`, `Tseq(m) = 3310951` and `Tseq(l) = 6382589`. 
 
-| **Speedup**      | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
-| ---------------- | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
-| **nt_results s** |         1.617 |         3.017 |         4.082 |          5.550 |          9.373 |          8.527 |
-| **nt_results m** |         1.462 |         2.179 |         3.696 |          5.012 |          5.935 |          6.405 |
-| **nt_results l** |         1.419 |         2.201 |         3.314 |          4.454 |          6.670 |          7.064 |
-| **ff_results s** |         1.946 |         3.340 |         3.917 |          3.629 |          4.827 |          4.649 |
-| **ff_results m** |         1.638 |         2.431 |         3.686 |          4.263 |          3.293 |          3.612 |
-| **ff_results l** |         1.567 |         2.543 |         3.848 |          3.558 |          4.135 |          3.513 |
+| **speedup 10MB**   | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
+| ------------------ | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
+| **native threads** |         1.617 |         3.017 |         4.082 |          5.550 |          9.373 |          8.527 |
+| **fastflow**       |         1.946 |         3.340 |         3.917 |          3.629 |          4.827 |          4.649 |
 
+![](src/imgs/speedup10.png)
 
+| **speedup 50MB**   | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
+| ------------------ | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
+| **native threads** |         1.462 |         2.179 |         3.696 |          5.012 |          5.935 |          6.405 |
+| **fastflow**       |         1.638 |         2.431 |         3.686 |          4.263 |          3.293 |          3.612 |
 
-**Speedup test with 10MB file and `Tseq = `** 
-| par. degree    |   2   |   4   |   8   |  16   |   32 |
-| :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |       |       |       |       |      |
-| fastflow       |       |       |       |       |      |
+![](src/imgs/speedup50.png)
 
-![](imgs/su_10.png)
+| **speedup 100MB**  | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
+| ------------------ | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
+| **native threads** |         1.419 |         2.201 |         3.314 |          4.454 |          6.670 |          7.064 |
+| **fastflow**       |         1.567 |         2.543 |         3.848 |          3.558 |          4.135 |          3.513 |
 
-**Speedup test with 50MB file and `Tseq = `**
-| par. degree    |   2   |   4   |   8   |  16   |   32 |
-| :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |       |       |       |       |      |
-| fastflow       |       |       |       |       |      |
+![](src/imgs/speedup100.png)
 
-![](imgs/su_50.png)
+| **scalability 10MB** | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
+| -------------------- | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
+| **native threads**   |         1.730 |         3.596 |         4.868 |          5.962 |         11.152 |         10.177 |
+| **fastflow**         |         1.524 |         2,618 |         3,067 |          2,844 |          3,774 |          3,642 |
 
-**Speedup test with 100MB file and `Tseq = `**
-| par. degree    |   2   |   4   |   8   |  16   |   32 |
-| :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |       |       |       |       |      |
-| fastflow       |       |       |       |       |      |
+![](src/imgs/scalab10.png)
 
-![](imgs/su_100.png)
+| **scalability 50MB** | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
+| -------------------- | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
+| **native threads**   |         1.829 |         3.147 |         4.951 |          6.697 |          8.557 |          8.523 |
+| **fastflow**         |         1,532 |         2,678 |         3,446 |          3,975 |          3,679 |          3,606 |
 
-#### Scalability tests
+![](src/imgs/scalab50.png)
 
-**Scalability test with 10MB file** 
-| par. degree    |   2   |   4   |   8   |  16   |   32 |
-| :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |       |       |       |       |      |
-| fastflow       |       |       |       |       |      |
+| **scalability 100MB** | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
+| --------------------- | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
+| **native threads**    |         1.842 |         3.751 |         4.502 |          7.195 |          9.417 |         10.254 |
+| **fastflow**          |         1,552 |         2,427 |         3,678 |          3,400 |          3,947 |          3,357 |
 
-**Scalability test with 50MB file** 
-| par. degree    |   2   |   4   |   8   |  16   |   32 |
-| :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |       |       |       |       |      |
-| fastflow       |       |       |       |       |      |
-
-**Scalability test with 100MB file** 
-| par. degree    |   2   |   4   |   8   |  16   |   32 |
-| :------------- | :---: | :---: | :---: | :---: | ---: |
-| native threads |       |       |       |       |      |
-| fastflow       |       |       |       |       |      |
-
-
-**Native threads execution times**
-| par. degree |    2    |    4    |    8    |   16    |      32 |
-| :---------- | :-----: | :-----: | :-----: | :-----: | ------: |
-| small       | 591602  | 430787  | 279434  | 214148  |  198527 |
-| medium      | 3704533 | 2404020 | 1466251 | 974799  |  829128 |
-| large       | 6343420 | 4366054 | 3495891 | 2521686 | 2158098 |
-
-**FastFlow execution times**
-| par. degree |    2    |    4    |    8    |   16    |      32 |
-| :---------- | :-----: | :-----: | :-----: | :-----: | ------: |
-| s           | 778778  | 595902  | 564325  | 506217  |  470083 |
-| m           | 3928956 | 3043096 | 2782430 | 2489869 | 2347214 |
-| l           | 7799152 | 6077468 | 5518873 | 4985412 | 4640515 |
+![](src/imgs/scalab100.png)
 
 ### How to run it
-
-##### Performance tests
 
 To create a random 10MB ascii file, just run:
 `base64 /dev/urandom | head -c 10000000 > 10M`
