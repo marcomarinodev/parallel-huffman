@@ -10,7 +10,7 @@ This report presents a parallel ASCII file compression algorithm utilizing the [
 - The implementations of the algorithm.
 - Integration tests to verify the correctness of the parallel solutions.
 
-### Algorithm phases
+## Algorithm phases
 After conducting an analysis, the following steps were identified as necessary to compress files using the Huffman Coding algorithm:
 
 1. **File read**: The file to be compressed is read.
@@ -21,12 +21,12 @@ After conducting an analysis, the following steps were identified as necessary t
 6. **Compression phas**e: The compressed string is grouped into `bitset<8>` to actually compress the file.
 7. **Write the compressed file**.
 
-### Performance tests
+## Performance tests
 Since the goal of this project was to identify areas for improvement in the sequential solution 
 using parallel computing techniques, I measured the execution time of each stage in the sequential
 solution, enabling the identification of potential candidates for refactoring and enhancement using multithreading. Additionally, I performed performance tests (executed by a machine using a dual socket, 16 cores each, 2 way hyper threading **AMD EPYC 7301**) with both the parallel implementations (native threads, and **[FastFlow](https://github.com/fastflow/fastflow)** C++ library). 
 
-#### Stages performance
+### Stages performance
 I decided to first benchmark how much each stages takes in the entire process of compression and here's what emerged by measuring the time taken from each stage (excluding the read/write and the actual compression) sequentially with three different file sizes which are `s=10MB`, `m=50MB`, and `l=100MB`:
 
 | stages performance (%) | counting | huffman tree | encoding |
@@ -39,23 +39,17 @@ The reason why the Huffman tree phase is much quicker is because the tree has an
 
 
 ### Speedup and scalability tests
-Recalling that *speedup* is a measure of the improvement in execution time achieved through parallelization and that `speedup(n) = Tseq / Tpar(n)` and *scalability* measures the ability of the system to maintain or improve its performance as the problem size or the number of processing units is scaled up `scalability(n) = Tpar(1) / Tpar(n)`. In the following table there is the speedup table, considering that the sequential time on average `Tseq = `
+Recalling that *speedup* is a measure of the improvement in execution time achieved through parallelization and that `speedup(n) = Tseq / Tpar(n)` and *scalability* measures the ability of the system to maintain or improve its performance as the problem size or the number of processing units is scaled up `scalability(n) = Tpar(1) / Tpar(n)`. In the following table there is the speedup table, considering that the sequential time on average `Tseq(s) = 724828`, `Tseq(m) = 3310951` and `Tseq(l) = 6382589`. 
 
-#### Speedup tests
-| 10MB Speedup       | 2 threads | 4 threads | 8 threads | 16 threads | 32 threads | 64 threads |
-| ------------------ | --------- | --------- | --------- | ---------- | ---------- | ---------- |
-| **nt_results (s)** | 1.61      | 3.01      | 4.08      | 5.54       | 9.35       | 8.52       |
-| **ff_results (s)** | 1.15      | 1.50      | 1.93      | 1.66       | 1.70       | 1.83       |
+| **Speedup**      | **2 threads** | **4 threads** | **8 threads** | **16 threads** | **32 threads** | **64 threads** |
+| ---------------- | ------------: | ------------: | ------------: | -------------: | -------------: | -------------: |
+| **nt_results s** |         1.617 |         3.017 |         4.082 |          5.550 |          9.373 |          8.527 |
+| **nt_results m** |         1.462 |         2.179 |         3.696 |          5.012 |          5.935 |          6.405 |
+| **nt_results l** |         1.419 |         2.201 |         3.314 |          4.454 |          6.670 |          7.064 |
+| **ff_results s** |         1.946 |         3.340 |         3.917 |          3.629 |          4.827 |          4.649 |
+| **ff_results m** |         1.638 |         2.431 |         3.686 |          4.263 |          3.293 |          3.612 |
+| **ff_results l** |         1.567 |         2.543 |         3.848 |          3.558 |          4.135 |          3.513 |
 
-| 50MB Speedup       | 2 threads | 4 threads | 8 threads | 16 threads | 32 threads | 64 threads |
-| ------------------ | --------- | --------- | --------- | ---------- | ---------- | ---------- |
-| **nt_results (m)** | 1.37      | 2.35      | 3.70      | 5.01       | 5.93       | 6.39       |
-| **ff_results (m)** | 1.15      | 1.58      | 1.68      | 1.65       | 1.92       | 1.88       |
-
-| 100MB Speedup      | 2 threads | 4 threads | 8 threads | 16 threads | 32 threads | 64 threads |
-| ------------------ | --------- | --------- | --------- | ---------- | ---------- | ---------- |
-| **nt_results (l)** | 1.29      | 2.20      | 3.18      | 5.09       | 6.67       | 7.25       |
-| **ff_results (l)** | 1.13      | 1.53      | 1.85      | 1.80       | 1.88       | 1.92       |
 
 
 **Speedup test with 10MB file and `Tseq = `** 
