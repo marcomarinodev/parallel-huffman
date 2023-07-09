@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
 	bool perform_tests = argc > 1 ? strcmp(argv[1], "test") == 0 : false;
 	int mode = argc > 2 ? atoi(argv[2]) : ff_par;
-	int num_thread = argc > 3 ? atoi(argv[3]) : 1;
+	int num_threads = argc > 3 ? atoi(argv[3]) : 1;
 	string filename = argc > 4 ? argv[4] : "./inputs/10M";
 	bool do_parallel_policy = mode != seq;
 
@@ -48,9 +48,13 @@ int main(int argc, char *argv[])
 			{
 				cout << "file big => parallel counting" << endl;
 				if (mode == nt_par)
-					par_map_chars = nt_solution::Gmr(num_thread, num_thread / 2 + 1).count_chars(chars);
+				{
+					// par_map_chars = nt_solution::count_chars(chars, num_threads);
+					par_map_chars = nt_solution::Gmr(num_threads, num_threads / 2 + 1).count_chars(chars);
+				}
+					
 				else
-					par_map_chars = ff_solution::count_chars(chars, num_thread);
+					par_map_chars = ff_solution::count_chars(chars, num_threads);
 			}
 			else
 			{
@@ -72,9 +76,9 @@ int main(int argc, char *argv[])
 				cout << "file big => parallel encoding" << endl;
 				string par_encoded_string;
 				if (mode == nt_par)
-					par_encoded_string = nt_solution::encode(chars, encoding_table, num_thread);
+					par_encoded_string = nt_solution::encode(chars, encoding_table, num_threads);
 				else
-					par_encoded_string = ff_solution::encode(chars, encoding_table, num_thread);
+					par_encoded_string = ff_solution::encode(chars, encoding_table, num_threads);
 			}
 			else
 			{

@@ -4,7 +4,8 @@ using namespace std;
 
 map<char, int> nt_solution::count_chars(const vector<char> &chars, int num_threads)
 {
-    map<char, int> counts;
+    vector<map<char, int>> chunk_counts(num_threads);
+    map<char, int> result;
     long par_count_chars_elapsed;
     {
         utimer par_count_chars_timer("par count chars timer", &par_count_chars_elapsed);
@@ -20,28 +21,27 @@ map<char, int> nt_solution::count_chars(const vector<char> &chars, int num_threa
             map<char, int> local_counts;
 
             for (int i = start; i < end; i++)
-            {
                 local_counts[chars[i]]++;
-            }
 
-            // locking the shared map
-            lock_guard<mutex> lock(counts_mtx);
-            for (const auto &pair : local_counts)
-                counts[pair.first] += pair.second;
+            chunk_counts[index] = local_counts;
         };
 
         for (int i = 0; i < num_threads; i++)
             threads.emplace_back(worker, i);
 
-        for (auto &t : threads)
-            t.join();
+        for (int i = 0; i < num_threads; i++)
+        {
+            threads[i].join();
+            for (auto entry: chunk_counts[i])
+                result[entry.first] += entry.second;
+        }
     }
 
 #ifdef DEBUG
     cout << "[PAR] par count chars elapsed: " << par_count_chars_elapsed << endl;
 #endif
 
-    return counts;
+    return result;
 }
 
 nt_solution::Gmr::Gmr(int map_nw, int red_nw)
@@ -189,11 +189,11 @@ string nt_solution::encode(const vector<char> &chars, const unordered_map<char, 
         for (int i = 0; i < num_threads; i++)
             encoding_threads.emplace_back(encode_chunk_worker, i);
 
-        for (auto &thread : encoding_threads)
-            thread.join();
-
-        for (const auto &chunk : encoded_chunks)
-            encoded_result += chunk;
+        for (int i = 0; i < num_threads; i++)
+        {
+            encoding_threads[i].join();
+            encoded_result += encoded_chunks[i];
+        }
     }
 
 #ifdef DEBUG
