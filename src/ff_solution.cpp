@@ -29,8 +29,6 @@ map<char, int> ff_solution::count_chars(vector<char> chars, int num_threads)
           par_map_chars_chunks[i] = local_map_chars;
         });
 
-cout << "here" << endl;
-
     // merging
     for (auto map_chars_chunk : par_map_chars_chunks)
       for (auto [character, occurrences] : map_chars_chunk)
@@ -85,5 +83,43 @@ string ff_solution::encode(vector<char> chars, unordered_map<char, string> encod
 #ifdef DEBUG
   cout << "[FF] par encoding elapsed: " << ff_par_encoding_elapsed << endl;
 #endif
+
+  int remainder = result.length() % 8;
+  string padded_encoded_string = remainder != 0 ? result.append(8 - remainder, '0') : result;
+
+  return padded_encoded_string;
+}
+
+vector<bitset<8>> ff_solution::compress(string encoded_string, int num_threads)
+{
+  vector<vector<bitset<8>>> compressed_chunks(num_threads);
+  vector<bitset<8>> result;
+  ff::ParallelFor pf(num_threads);
+  int chunk_size = encoded_string.length() / num_threads;
+  chunk_size = chunk_size - chunk_size % 8;
+
+  pf.parallel_for_static(
+    0, num_threads, 1, 0, [chunk_size, num_threads, &compressed_chunks, encoded_string](const long i)
+  {
+    int start = i * chunk_size;
+    int end = i == num_threads - 1 ? encoded_string.length() : start + chunk_size;
+    vector<bitset<8>> byte_chunks;
+
+    for (int j = start; j < end; j += 8)
+    {
+      bitset<8> bits(encoded_string.substr(j, 8));
+      byte_chunks.push_back(bits);
+    }
+
+    compressed_chunks[i] = byte_chunks;
+  });
+
+  // merging
+  for (int i = 0; i < num_threads; i++)
+  {
+    for (auto byte_chunk : compressed_chunks[i])
+        result.push_back(byte_chunk);
+  }
+
   return result;
 }

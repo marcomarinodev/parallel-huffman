@@ -77,7 +77,7 @@ void test_fastflow_encoding(int input_size)
   // sequential counting
   map<char, int> seq_map_chars = seq_solution::count_chars(chars);
 
-  ASSERT_TRUE(par_map_chars == seq_map_chars);
+  ASSERT_TRUE_MSG(par_map_chars == seq_map_chars, "[TEST FASTFLOW COUNTING] - PASSED");
 
   // build encoding table
   min_heap_node *huffman_tree = build_huffman_tree(par_map_chars);
@@ -90,6 +90,15 @@ void test_fastflow_encoding(int input_size)
   string seq_encoded_string = seq_solution::encode(chars, encoding_table);
 
   ASSERT_TRUE_MSG(par_encoded_string == seq_encoded_string, "[TEST FASTFLOW ENCODING] - PASSED");
+
+  // fastflow compression
+  vector<bitset<8>> par_bitset = ff_solution::compress(par_encoded_string, thread::hardware_concurrency());
+  
+  // sequential compression
+  vector<bitset<8>> seq_bitset = seq_solution::compress(seq_encoded_string);
+
+  ASSERT_TRUE_MSG(par_bitset == seq_bitset, "[TEST FASTFLOW COMPRESSION] - PASSED");
+
 } 
 
 void test_native_threads_encoding(int input_size)
@@ -106,7 +115,7 @@ void test_native_threads_encoding(int input_size)
   par_map_gmr_chars = nt_solution::Gmr(map_nw, red_nw).count_chars(chars);
   seq_map_chars = seq_solution::count_chars(chars);  
 
-  ASSERT_TRUE(par_map_chars == seq_map_chars && par_map_gmr_chars == seq_map_chars);
+  ASSERT_TRUE_MSG(par_map_chars == seq_map_chars && par_map_gmr_chars == seq_map_chars, "[TEST NATIVE THREADS COUNTING] - PASSED");
 
   // build encoding table
   min_heap_node *huffman_tree = build_huffman_tree(par_map_chars);
@@ -119,6 +128,14 @@ void test_native_threads_encoding(int input_size)
   string seq_encoded_string = seq_solution::encode(chars, encoding_table);
 
   ASSERT_TRUE_MSG(par_encoded_string == seq_encoded_string, "[TEST NATIVE THREADS ENCODING] - PASSED");
+
+  // parallel compression
+  vector<bitset<8>> par_bitset = nt_solution::compress(par_encoded_string, thread::hardware_concurrency());
+
+  // sequential compression
+  vector<bitset<8>> seq_bitset = seq_solution::compress(seq_encoded_string);
+
+  ASSERT_TRUE_MSG(par_bitset == seq_bitset, "[TEST NATIVE THREADS COMPRESSION] - PASSED");
 }
 
 // helpers

@@ -71,25 +71,25 @@ int main(int argc, char *argv[])
 			// -----------------------------
 			// ------ Encoding phase -------
 			// -----------------------------
+			string encoded_string;
 			if (do_parallel_policy)
 			{
 				cout << "file big => parallel encoding" << endl;
-				string par_encoded_string;
 				if (mode == nt_par)
-					par_encoded_string = nt_solution::encode(chars, encoding_table, num_threads);
+					encoded_string = nt_solution::encode(chars, encoding_table, num_threads);
 				else
-					par_encoded_string = ff_solution::encode(chars, encoding_table, num_threads);
+					encoded_string = ff_solution::encode(chars, encoding_table, num_threads);
 			}
 			else
 			{
 				cout << "file small => sequential encoding" << endl;
-				string seq_encoded_string = seq_solution::encode(chars, encoding_table);
+				encoded_string = seq_solution::encode(chars, encoding_table);
 			}
 
 			// -----------------------------
 			// --------- Compress ----------
 			// -----------------------------
-			// vector<bitset<8>> par_encoded_bitset = seq_solution::compress(par_encoded_string);
+			vector<bitset<8>> par_encoded_bitset = seq_solution::compress(encoded_string);
 		}
 
 		cout << "execution time: " << execution_time << endl;

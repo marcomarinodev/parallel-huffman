@@ -46,6 +46,8 @@ namespace nt_solution
   /// @return string version of the input encoding
   string encode(const vector<char>& chars, const unordered_map<char, string> &encoding_table, int num_threads);
 
+  vector<bitset<8>> compress(string encoded_string, int num_threads);
+
 }
 
 #endif

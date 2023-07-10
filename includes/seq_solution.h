@@ -29,12 +29,6 @@ namespace seq_solution
   /// @return compressed encoded string as a vector of bytes
   vector<bitset<8>> compress(string encoded_string);
 
-  /// @brief [Monothread] extended version of encode function, but in this case compress directly the encoding
-  /// using bitset<8>. Use this function to prepare the compressed version of your input.
-  /// @param chars 
-  /// @param encoding_table
-  /// @return compressed encoded input
-  vector<bitset<8>> encode_and_compress(const vector<char> &chars, const unordered_map<char, string> &encoding_table);
-}
+ }
 
 #endif

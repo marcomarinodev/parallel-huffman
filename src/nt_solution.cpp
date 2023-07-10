@@ -200,5 +200,50 @@ string nt_solution::encode(const vector<char> &chars, const unordered_map<char, 
     cout << "[PAR] par encoding elapsed: " << par_encoding_elapsed << endl;
 #endif
 
-    return encoded_result;
+    int remainder = encoded_result.length() % 8;
+    string padded_encoded_string = remainder != 0 ? encoded_result.append(8 - remainder, '0') : encoded_result;
+
+    return padded_encoded_string;
+}
+
+vector<bitset<8>> nt_solution::compress(string encoded_string, int num_threads)
+{
+    vector<vector<bitset<8>>> compressed_chunks(num_threads);
+    vector<bitset<8>> result;
+    vector<thread> threads;
+    int chunk_size = encoded_string.length() / num_threads;
+    chunk_size = chunk_size - chunk_size % 8;
+
+    auto compress_worker = [&](int index)
+    {
+        int start = index * chunk_size;
+        int end = index == num_threads - 1 ? encoded_string.length() : start + chunk_size;
+        vector<bitset<8>> byte_chunks;
+
+        // start - end % 8 = 0
+        for (int i = start; i < end; i += 8)
+        {
+            bitset<8> bits(encoded_string.substr(i, 8));
+            byte_chunks.push_back(bits);
+        }
+
+        compressed_chunks[index] = byte_chunks;
+    };
+
+    for (int i = 0; i < num_threads; i++)
+        threads.emplace_back(compress_worker, i);
+
+    // merging the vector<bitset<8>>
+    for (int i = 0; i < num_threads; i++)
+    {
+        threads[i].join();
+    }
+
+    for (int i = 0; i < num_threads; i++)
+    {
+        for (auto byte_chunk : compressed_chunks[i])
+            result.push_back(byte_chunk);
+    }
+
+    return result;
 }

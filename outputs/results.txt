@@ -3,6 +3,11 @@ s: 724828
 m: 3310951
 l: 6382589
 
+read time:
+s:
+m:
+l:
+
 ========== NT RESULTS ==========
 nt_results 1 thread:
 s: 865218
