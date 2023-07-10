@@ -26,7 +26,8 @@ namespace ff_solution
   /// @return encoded input
   string encode(vector<char> chars, unordered_map<char, string> encoding_table, int num_threads);
 
-  vector<bitset<8>> compress(string encoded_string, int num_threads);
+
+  string compress(string encoded_string, int num_threads);
 }
 
 #endif

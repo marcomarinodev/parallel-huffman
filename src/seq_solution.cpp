@@ -50,15 +50,15 @@ string seq_solution::encode(vector<char> chars, unordered_map<char, string> enco
     return padded_encoded_string;
 }
 
-vector<bitset<8>> seq_solution::compress(string encoded_string)
+string seq_solution::compress(string encoded_string)
 {
-    vector<bitset<8>> byte_chunks;
+    string compressed;
 
     for (size_t i = 0; i < encoded_string.length(); i += 8)
     {
         bitset<8> bits(encoded_string.substr(i, 8));
-        byte_chunks.push_back(bits);
+        compressed += char(bits.to_ulong());
     }
 
-    return byte_chunks;
+    return compressed;
 }

@@ -27,7 +27,7 @@ namespace seq_solution
   /// @brief [Monothread] compress an encoded string passed by parameter using bitsets
   /// @param encoded_string
   /// @return compressed encoded string as a vector of bytes
-  vector<bitset<8>> compress(string encoded_string);
+  string compress(string encoded_string);
 
  }
 

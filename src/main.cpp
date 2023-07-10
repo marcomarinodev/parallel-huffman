@@ -32,9 +32,15 @@ int main(int argc, char *argv[])
 
 	cout << "analyzing: " << filename << endl;
 	vector<char> chars;
-	chars = read_file(filename);
+	string encoded_input;
+	long read_time;
+	{
+		utimer read_timer("read timer", &read_time);
+		chars = read_file(filename);
+	}
+	cout << "read time: " << read_time << endl;
 
-	for (int j = 0; j < 5; j++)
+	for (int j = 0; j < 10; j++)
 	{
 		long execution_time;
 		{
@@ -49,10 +55,10 @@ int main(int argc, char *argv[])
 				cout << "file big => parallel counting" << endl;
 				if (mode == nt_par)
 				{
-					// par_map_chars = nt_solution::count_chars(chars, num_threads);
-					par_map_chars = nt_solution::Gmr(num_threads, num_threads / 2 + 1).count_chars(chars);
+					par_map_chars = nt_solution::count_chars(chars, num_threads);
+					// par_map_chars = nt_solution::Gmr(num_threads, num_threads / 2 + 1).count_chars(chars);
 				}
-					
+
 				else
 					par_map_chars = ff_solution::count_chars(chars, num_threads);
 			}
@@ -89,22 +95,25 @@ int main(int argc, char *argv[])
 			// -----------------------------
 			// --------- Compress ----------
 			// -----------------------------
-			vector<bitset<8>> encoded_bitset;
+
 			if (do_parallel_policy)
 			{
 				if (mode == nt_par)
-					encoded_bitset = nt_solution::compress(encoded_string, num_threads);
-				else 
-					encoded_bitset = ff_solution::compress(encoded_string, num_threads);
-			} 
-			else 
+					encoded_input = nt_solution::compress(encoded_string, num_threads);
+				else
+					encoded_input = ff_solution::compress(encoded_string, num_threads);
+			}
+			else
 			{
-				encoded_bitset = seq_solution::compress(encoded_string);
+				encoded_input = seq_solution::compress(encoded_string);
 			}
 		}
 
 		cout << "execution time: " << execution_time << endl;
 	}
+
+	cout << "writing compressed file " << endl;
+	seq_write_file_string("./outputs/compressed", encoded_input);
 
 	return 0;
 }

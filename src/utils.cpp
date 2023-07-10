@@ -150,9 +150,10 @@ void par_write_bits_chunks(vector<vector<bitset<8>>> compressed_chunks, const st
 
 void write_bitset(const vector<bitset<8>> &vec, const string &filename)
 {
-    ofstream outfile(filename, ios::out | ios::binary);
+    ofstream outfile(filename, ios::binary);
     for (const auto &b : vec)
     {
+        
         unsigned long i = b.to_ulong();
         outfile.write(reinterpret_cast<const char *>(&i), sizeof(i));
     }

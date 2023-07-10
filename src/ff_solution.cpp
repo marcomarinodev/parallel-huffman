@@ -90,10 +90,10 @@ string ff_solution::encode(vector<char> chars, unordered_map<char, string> encod
   return padded_encoded_string;
 }
 
-vector<bitset<8>> ff_solution::compress(string encoded_string, int num_threads)
+string ff_solution::compress(string encoded_string, int num_threads)
 {
-  vector<vector<bitset<8>>> compressed_chunks(num_threads);
-  vector<bitset<8>> result;
+  vector<string> compressed_chunks(num_threads);
+  string result;
   ff::ParallelFor pf(num_threads);
   int chunk_size = encoded_string.length() / num_threads;
   chunk_size = chunk_size - chunk_size % 8;
@@ -103,23 +103,20 @@ vector<bitset<8>> ff_solution::compress(string encoded_string, int num_threads)
   {
     int start = i * chunk_size;
     int end = i == num_threads - 1 ? encoded_string.length() : start + chunk_size;
-    vector<bitset<8>> byte_chunks;
+    string compressed_chunk;
 
     for (int j = start; j < end; j += 8)
     {
       bitset<8> bits(encoded_string.substr(j, 8));
-      byte_chunks.push_back(bits);
+      compressed_chunk += char(bits.to_ulong());
     }
 
-    compressed_chunks[i] = byte_chunks;
+    compressed_chunks[i] = compressed_chunk;
   });
 
   // merging
   for (int i = 0; i < num_threads; i++)
-  {
-    for (auto byte_chunk : compressed_chunks[i])
-        result.push_back(byte_chunk);
-  }
+    result += compressed_chunks[i];
 
   return result;
 }

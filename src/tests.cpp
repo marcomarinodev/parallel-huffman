@@ -92,12 +92,12 @@ void test_fastflow_encoding(int input_size)
   ASSERT_TRUE_MSG(par_encoded_string == seq_encoded_string, "[TEST FASTFLOW ENCODING] - PASSED");
 
   // fastflow compression
-  vector<bitset<8>> par_bitset = ff_solution::compress(par_encoded_string, thread::hardware_concurrency());
+  string par_compressed_string = ff_solution::compress(par_encoded_string, thread::hardware_concurrency());
   
   // sequential compression
-  vector<bitset<8>> seq_bitset = seq_solution::compress(seq_encoded_string);
+  string seq_compressed_string = seq_solution::compress(seq_encoded_string);
 
-  ASSERT_TRUE_MSG(par_bitset == seq_bitset, "[TEST FASTFLOW COMPRESSION] - PASSED");
+  ASSERT_TRUE_MSG(par_compressed_string == seq_compressed_string, "[TEST FASTFLOW COMPRESSION] - PASSED");
 
 } 
 
@@ -130,12 +130,12 @@ void test_native_threads_encoding(int input_size)
   ASSERT_TRUE_MSG(par_encoded_string == seq_encoded_string, "[TEST NATIVE THREADS ENCODING] - PASSED");
 
   // parallel compression
-  vector<bitset<8>> par_bitset = nt_solution::compress(par_encoded_string, thread::hardware_concurrency());
+  string par_compressed_string = nt_solution::compress(par_encoded_string, thread::hardware_concurrency());
 
   // sequential compression
-  vector<bitset<8>> seq_bitset = seq_solution::compress(seq_encoded_string);
+  string seq_compressed_string = seq_solution::compress(seq_encoded_string);
 
-  ASSERT_TRUE_MSG(par_bitset == seq_bitset, "[TEST NATIVE THREADS COMPRESSION] - PASSED");
+  ASSERT_TRUE_MSG(par_compressed_string == seq_compressed_string, "[TEST NATIVE THREADS COMPRESSION] - PASSED");
 }
 
 // helpers
