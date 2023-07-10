@@ -201,9 +201,11 @@ string nt_solution::encode(const vector<char> &chars, const unordered_map<char, 
 #endif
 
     int remainder = encoded_result.length() % 8;
-    string padded_encoded_string = remainder != 0 ? encoded_result.append(8 - remainder, '0') : encoded_result;
 
-    return padded_encoded_string;
+    if (remainder != 0)
+        encoded_result.append(8 - remainder, '0');
+
+    return encoded_result;
 }
 
 string nt_solution::compress(string encoded_string, int num_threads)

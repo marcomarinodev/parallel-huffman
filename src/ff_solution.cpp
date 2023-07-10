@@ -85,9 +85,11 @@ string ff_solution::encode(vector<char> chars, unordered_map<char, string> encod
 #endif
 
   int remainder = result.length() % 8;
-  string padded_encoded_string = remainder != 0 ? result.append(8 - remainder, '0') : result;
 
-  return padded_encoded_string;
+  if (remainder != 0)
+      result.append(8 - remainder, '0');
+
+  return result;
 }
 
 string ff_solution::compress(string encoded_string, int num_threads)

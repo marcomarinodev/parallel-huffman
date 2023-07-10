@@ -45,9 +45,11 @@ string seq_solution::encode(vector<char> chars, unordered_map<char, string> enco
 #endif
 
     int remainder = encoded_string.length() % 8;
-    string padded_encoded_string = remainder != 0 ? encoded_string.append(8 - remainder, '0') : encoded_string;
 
-    return padded_encoded_string;
+    if (remainder != 0)
+        encoded_string.append(8 - remainder, '0');
+
+    return encoded_string;
 }
 
 string seq_solution::compress(string encoded_string)
