@@ -89,7 +89,18 @@ int main(int argc, char *argv[])
 			// -----------------------------
 			// --------- Compress ----------
 			// -----------------------------
-			vector<bitset<8>> par_encoded_bitset = seq_solution::compress(encoded_string);
+			vector<bitset<8>> encoded_bitset;
+			if (do_parallel_policy)
+			{
+				if (mode == nt_par)
+					encoded_bitset = nt_solution::compress(encoded_string, num_threads);
+				else 
+					encoded_bitset = ff_solution::compress(encoded_string, num_threads);
+			} 
+			else 
+			{
+				encoded_bitset = seq_solution::compress(encoded_string);
+			}
 		}
 
 		cout << "execution time: " << execution_time << endl;
