@@ -1,4 +1,4 @@
-# Parallel Huffman Coding
+# Parallel Huffman
 
 ## Report
 This report presents a parallel ASCII file compression algorithm utilizing the [Huffman Coding Algorithm](https://en.wikipedia.org/wiki/Huffman_coding). The algorithm exploits the concurrency of contemporary multicore processors to enhance the performance of the traditional algorithm. The primary contributions of this work are as follows:
